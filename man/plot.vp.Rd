@@ -4,10 +4,17 @@
 \alias{plot.vp}
 \title{Plot a vertical profile (\code{vp})}
 \usage{
-\method{plot}{vp}(x, quantity = "dens",
+\method{plot}{vp}(
+  x,
+  quantity = "dens",
   xlab = expression("volume density [#/km"^3 * "]"),
-  ylab = "height [km]", line_col = "red", line_lwd = 1,
-  line.col = "red", line.lwd = 1, ...)
+  ylab = "height [km]",
+  line_col = "red",
+  line_lwd = 1,
+  line.col = "red",
+  line.lwd = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{vp} class object.}
@@ -41,7 +48,19 @@
 Plot a vertical profile (\code{vp})
 }
 \examples{
+# load example vp object:
 data(example_vp)
-plot(example_vp)
+
+# plot the animal density:
+plot(example_vp, quantity = "dens")
+
+# change the line color:
 plot(example_vp, line_col = "blue")
+
+# plot the ground speed:
+plot(example_vp, quantity = "ff")
+
+# plot the reflectivity factor of
+# all scatterers (including precipitation):
+plot(example_vp, quantity = "DBZH")
 }

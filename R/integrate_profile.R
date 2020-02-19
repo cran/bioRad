@@ -29,19 +29,42 @@
 #'    \item{\code{vir}}{Vertically Integrated Reflectivity in cm^2/km^2}
 #'    \item{\code{mtr}}{Migration Traffic Rate in individuals/km/h}
 #'    \item{\code{rtr}}{Reflectivity Traffic Rate in cm^2/km/h}
-#'    \item{\code{mt}}{Migration Traffic in individuals/km}
-#'    \item{\code{rt}}{Reflectivity Traffic in cm^2/km}
+#'    \item{\code{mt}}{Migration Traffic in individuals/km, cumulated from
+#'       the start of the time series up to \code{datetime}}
+#'    \item{\code{rt}}{Reflectivity Traffic in cm^2/km, cumulated from
+#'       the start of the time series up to \code{datetime}}
 #'    \item{\code{ff}}{Horizontal ground speed in m/s}
 #'    \item{\code{dd}}{Horizontal ground speed direction in degrees}
 #'    \item{\code{u}}{Ground speed component west to east in m/s}
 #'    \item{\code{v}}{Ground speed component north to south in m/s}
-#'    \item{\code{HGHT}}{Height above sea level in m}
+#'    \item{\code{height}}{Mean flight height (height weighted by eta) in m above sea level}
 #' }
 #' Vertically integrated density and reflectivity are related according to
 #' \eqn{vid=vir/rcs(x)}, with \link{rcs} the assumed radar cross section per
 #' individual. Similarly, migration traffic rate and reflectivity traffic rate
 #' are related according to \eqn{mtr=rtr/rcs(x)}
 #' }
+#'
+#' \subsection{Ground speed (ff) and ground speed components (u,v)}{
+#' The height-averaged ground speed is defined as:
+#'
+#' \deqn{ff = \sum_i dens_i ff_i / \sum_i dens_i}{ff = \sum_i dens_i ff_i / \sum_i dens_i}
+#' with the sum running over all altitude layers between \code{alt_min} and
+#' \code{alt_max}, \eqn{dens_i} the bird density, \eqn{ff_i} the ground speed at
+#' altitude layer i.
+#'
+#' the height-averaged u component (west to east) is defined as:
+#'
+#' \deqn{u = \sum_i dens_i u_i / \sum_i dens_i}{u = \sum_i dens_i u_i / \sum_i dens_i}
+#'
+#' the height-averaged v component (south to north) is defined as:
+#'
+#' \deqn{v = \sum_i dens_i v_i / \sum_i dens_i}{v = \sum_i dens_i v_i / \sum_i dens_i}
+#' }
+#'
+#' Note that \eqn{ff_i=\sqrt(u_i^2 + v_i^2)}, but the same does not hold for the
+#' height-integrated speeds, i.e. \eqn{ff != \sqrt(u^2 + v^2)} as soon as the
+#' ground speed directions vary with altitude.
 #'
 #' \subsection{Migration traffic rate (mtr) and reflectivity traffic rate (rtr)}{
 #' Migration traffic rate (mtr) for an altitude layer is a flux measure, defined
@@ -56,20 +79,25 @@
 #' migratory movement at all times and altitudes. In this case \code{mtr} is
 #' always a positive quantity, defined as:
 #'
-#' \deqn{mtr = \sum_i dens_i ff_i \Delta h}{mtr = \sum_i dens_i ff_i \Delta h}
+#' \deqn{mtr = 3.6 \sum_i dens_i ff_i \Delta h}{mtr = 3.6 \sum_i dens_i ff_i \Delta h}
 #'
 #' with the sum running over all altitude layers between \code{alt_min} and
 #' \code{alt_max}, \eqn{dens_i} the bird density, \eqn{ff_i} the ground speed at
-#' altitude layer i, and \eqn{\Delta h} the altitude layer width.
+#' altitude layer i, and \eqn{\Delta h} the altitude layer width. The factor 3.6
+#' refers to a unit conversion of speeds \eqn{ff_i} from m/s to km/h.
 #'
 #' If \code{alpha} is given a numeric value, the transect is taken perpendicular
 #' to the direction \code{alpha}, and the number of crossing targets per hour
 #' per km transect is calculated as:
 #'
-#' \deqn{mtr = \sum_i dens_i ff_i \cos(dd_i-alpha) \Delta h}{mtr = \sum_i dens_i ff_i \cos(dd_i-alpha) \Delta h}
+#' \deqn{mtr = 3.6 \sum_i dens_i ff_i \cos((dd_i-alpha) pi/180) \Delta h}{mtr = 3.6 \sum_i dens_i ff_i \cos((dd_i-alpha) pi/180) \Delta h}
 #' with \eqn{dd_i} the migratory direction at altitude i.
 #'
 #' Note that this equation evaluates to the previous equation when \code{alpha} equals \eqn{dd_i}.
+#' Also note we can rewrite this equation using trigonemetry as:
+#'
+#' \deqn{mtr = 3.6 \sum_i dens_i (u_i \sin(alpha pi/180) + v_i \cos(alpha pi/180)) \Delta h}{mtr = 3.6 \sum_i dens_i (u_i \sin(alpha pi/180) + v_i \cos(alpha pi/180)) \Delta h}
+#' with \eqn{u_i} and \eqn{v_i} the u and v ground speed components at altitude i.
 #'
 #' In this definition \code{mtr} is a traditional flux into a direction of
 #' interest. Targets moving into the direction \code{alpha} contribute
@@ -77,11 +105,17 @@
 #' contribute negatively to \code{mtr}. Therefore \code{mtr} can be both
 #' positive or negative, depending on the definition of alpha.
 #'
+#' Note that \code{mtr} for a given value of \code{alpha} can also be calculated from
+#' the vertically integrated density \code{vid} and the height-integrated velocity
+#' components \code{u} and \code{v} as follows:
+#'
+#' \deqn{mtr = 3.6 (u \sin(alpha pi/180) + v \cos(alpha pi/180)) vid}{mtr = 3.6 (u \sin(alpha pi/180) + v \cos(alpha pi/180)) vid}
+#'
 #' Formula for reflectivity traffic rate \code{rtr} are found by replacing
-#' \code{dens} with \code{eta} in the formula for \code{mtr}.
+#' \code{dens} with \code{eta} and \code{vid} with \code{vir} in the formula for \code{mtr}.
 #' Reflectivity traffic rate gives the cross-sectional area
 #' passing the radar per km transect perpendicular to the migratory direction per hour.
-#' \code{rtr} values are conditional on settings of \link{rcs}, while \code{mtr} values are not.
+#' \code{mtr} values are conditional on settings of \link{rcs}, while \code{rtr} values are not.
 #' }
 #'
 #' \subsection{Migration traffic (mt) and reflectivity traffic (rt)}{
@@ -97,7 +131,7 @@
 #' position of the radar for the full period of the time series within the
 #' specified altitude band.
 #'
-#' \code{rt} values are conditional on settings of \link{rcs}, while \code{mt} values are not.
+#' \code{mt} values are conditional on settings of \link{rcs}, while \code{rt} values are not.
 #'
 #' Columnns mt and rt in the output dataframe provides migration traffic as a numeric value equal to
 #' migration traffic and reflectivity traffic from the start of the time series up till the moment of the time stamp
@@ -108,10 +142,10 @@
 #' @examples
 #' # MTR for a single vertical profile
 #' integrate_profile(example_vp)
-#' 
+#'
 #' # MTRs for a list of vertical profiles
 #' integrate_profile(c(example_vp, example_vp))
-#' 
+#'
 #' # MTRs for a time series of vertical profiles
 #' # load example data:
 #' data(example_vpts)
@@ -142,35 +176,31 @@ integrate_profile.vp <- function(x, alt_min = 0, alt_max = Inf, alpha = NA,
 
   if (alt_max <= alt_min) stop("'alt_min' should be smaller than 'alt_max'")
 
-  alt_min <- max(alt_min, min(x$data$HGHT))
-  alt_max <- min(alt_max, max(x$data$HGHT) + interval)
+  alt_min <- max(alt_min, min(x$data$height))
+  alt_max <- min(alt_max, max(x$data$height) + interval)
   if (alt_max - alt_min <= interval) stop(paste("selected altitude range (", alt_min, "-", alt_max, " m) should be wider than the width of a single altitude layer (", interval, " m)", sep = ""))
 
-  index <- which(x$data$HGHT >= alt_min & x$data$HGHT < alt_max)
+  index <- which(x$data$height >= alt_min & x$data$height < alt_max)
   if (is.na(alpha)) {
     cosfactor <- rep(1, length(index))
   } else {
     cosfactor <- cos((get_quantity(x, "dd")[index] - alpha) * pi / 180)
   }
+  dens_quantity <- get_quantity(x, "dens")[index]
+  dens_quantity[is.na(dens_quantity)] <- 0
+
   # multiply speeds by 3.6 to convert m/s to km/h
-  mtr <- sum(get_quantity(x, "dens")[index] * cosfactor *
+  mtr <- sum(dens_quantity * cosfactor *
     get_quantity(x, "ff")[index] * 3.6 * interval / 1000, na.rm = TRUE)
   rtr <- sum(get_quantity(x, "eta")[index] * cosfactor *
     get_quantity(x, "ff")[index] * 3.6 * interval / 1000, na.rm = TRUE)
-  vid <- sum(get_quantity(x, "dens")[index], na.rm = TRUE) * interval / 1000
+  vid <- sum(dens_quantity, na.rm = TRUE) * interval / 1000
   vir <- sum(get_quantity(x, "eta")[index], na.rm = TRUE) * interval / 1000
-  height <- sum((get_quantity(x, "HGHT") + x$attributes$where$interval / 2) *
-    get_quantity(x, "dens")[index], na.rm = TRUE) / sum(
-    get_quantity(x, "dens")[index],
-    na.rm = TRUE
-  )
-  u <- sum(get_quantity(x, "u")[index] * get_quantity(x, "dens")[index],
-    na.rm = TRUE
-  ) / sum(get_quantity(x, "dens")[index], na.rm = TRUE)
-  v <- sum(get_quantity(x, "v")[index] * get_quantity(x, "dens")[index],
-    na.rm = TRUE
-  ) / sum(get_quantity(x, "dens")[index], na.rm = TRUE)
-  ff <- sqrt(u^2 + v^2)
+  height <- weighted.mean(get_quantity(x, "height")[index] + x$attributes$where$interval / 2, dens_quantity, na.rm = TRUE)
+
+  u <- weighted.mean(get_quantity(x, "u")[index], dens_quantity, na.rm = TRUE)
+  v <- weighted.mean(get_quantity(x, "v")[index], dens_quantity, na.rm = TRUE)
+  ff <- weighted.mean(get_quantity(x, "ff")[index], dens_quantity, na.rm = TRUE)
   dd <- (pi / 2 - atan2(v, u)) * 180 / pi
   # time-integrated measures not defined for a single profile:
   mt <- NA
@@ -179,8 +209,18 @@ integrate_profile.vp <- function(x, alt_min = 0, alt_max = Inf, alpha = NA,
   output <- data.frame(
     datetime = x$datetime, mtr = mtr, vid = vid, vir = vir,
     rtr = rtr, mt = mt, rt = rt, ff = ff, dd = dd, u = u,
-    v = v, HGHT = height
+    v = v, height = height
   )
+
+  if ("u_wind" %in% names(x$data) & "v_wind" %in% names(x$data)) {
+    airspeed_u <- get_quantity(x, "u")[index] - get_quantity(x, "u_wind")[index]
+    airspeed_v <- get_quantity(x, "v")[index] - get_quantity(x, "v_wind")[index]
+    output$airspeed <- weighted.mean(sqrt(airspeed_u^2 + airspeed_v^2), dens_quantity, na.rm = TRUE)
+    output$heading <- weighted.mean((pi / 2 - atan2(airspeed_v, airspeed_u)) * 180 / pi, dens_quantity, na.rm = TRUE)
+    output$airspeed_u <- weighted.mean(airspeed_u, dens_quantity, na.rm = TRUE)
+    output$airspeed_v <- weighted.mean(airspeed_u, dens_quantity, na.rm = TRUE)
+  }
+
   class(output) <- c("vpi", "data.frame")
   rownames(output) <- NULL
   attributes(output)$alt_min <- alt_min
@@ -232,40 +272,39 @@ integrate_profile.vpts <- function(x, alt_min = 0, alt_max = Inf,
 
   if (alt_max <= alt_min) stop("'alt_min' should be smaller than 'alt_max'")
 
-  alt_min <- max(alt_min, min(x$heights))
-  alt_max <- min(alt_max, max(x$heights) + interval)
+  alt_min <- max(alt_min, min(x$height))
+  alt_max <- min(alt_max, max(x$height) + interval)
   if (alt_max - alt_min <= interval) stop(paste("selected altitude range (", alt_min, "-", alt_max, " m) should be wider than the width of a single altitude layer (", interval, " m)", sep = ""))
 
-  index <- which(x$heights >= alt_min & x$heights < alt_max)
+  index <- which(x$height >= alt_min & x$height < alt_max)
   if (is.na(alpha)) {
     cosfactor <- 1 + 0 * get_quantity(x, "dd")[index, ]
   } else {
     cosfactor <- cos((get_quantity(x, "dd")[index, ] - alpha) * pi / 180)
   }
+
+  dens_quantity <- colSums(get_quantity(x, "dens")[index, ], na.rm = TRUE)
+
   # multiply speeds by 3.6 to convert m/s to km/h
   mtr <- colSums(cosfactor * get_quantity(x, "ff")[index, ] * 3.6 *
     get_quantity(x, "dens")[index, ], na.rm = TRUE) * interval / 1000
   rtr <- colSums(cosfactor * get_quantity(x, "ff")[index, ] * 3.6 *
     get_quantity(x, "eta")[index, ], na.rm = TRUE) * interval / 1000
-  vid <- colSums(get_quantity(x, "dens")[index, ], na.rm = TRUE) * interval / 1000
+  vid <- dens_quantity * interval / 1000
   vir <- colSums(get_quantity(x, "eta")[index, ], na.rm = TRUE) * interval / 1000
-  height <- colSums((x$heights[index] + x$attributes$where$interval / 2) *
+  height <- colSums((x$height[index] + x$attributes$where$interval / 2) *
     get_quantity(x, "dens")[index, ],
   na.rm = TRUE
-  ) / colSums(get_quantity(x, "dens")[index, ],
-    na.rm = TRUE
-  )
+  ) / dens_quantity
   u <- colSums(get_quantity(x, "u")[index, ] * get_quantity(x, "dens")[index, ],
     na.rm = TRUE
-  ) / colSums(get_quantity(x, "dens")[index, ],
-    na.rm = TRUE
-  )
+  ) / dens_quantity
   v <- colSums(get_quantity(x, "v")[index, ] * get_quantity(x, "dens")[index, ],
     na.rm = TRUE
-  ) / colSums(get_quantity(x, "dens")[index, ],
+  ) / dens_quantity
+  ff <- colSums(get_quantity(x, "ff")[index, ] * get_quantity(x, "dens")[index, ],
     na.rm = TRUE
-  )
-  ff <- sqrt(u^2 + v^2)
+  ) / dens_quantity
   dd <- (pi / 2 - atan2(v, u)) * 180 / pi
   # time-integrated measures:
   dt <- (c(0, x$timesteps) + c(x$timesteps, 0)) / 2
@@ -278,8 +317,19 @@ integrate_profile.vpts <- function(x, alt_min = 0, alt_max = Inf,
   output <- data.frame(
     datetime = x$datetime, mtr = mtr, vid = vid, vir = vir,
     rtr = rtr, mt = mt, rt = rt, ff = ff, dd = dd, u = u,
-    v = v, HGHT = height
+    v = v, height = height
   )
+
+  if ("u_wind" %in% names(x$data) & "v_wind" %in% names(x$data)) {
+    airspeed_u <- get_quantity(x, "u")[index, ] - get_quantity(x, "u_wind")[index, ]
+    airspeed_v <- get_quantity(x, "v")[index, ] - get_quantity(x, "v_wind")[index, ]
+    output$airspeed <- colSums(sqrt(airspeed_u^2 + airspeed_v^2) * get_quantity(x, "dens")[index, ], na.rm = TRUE) /
+      dens_quantity
+    output$heading <- colSums(((pi / 2 - atan2(airspeed_v, airspeed_u)) * 180 / pi) * get_quantity(x, "dens")[index, ], na.rm = TRUE) / dens_quantity
+    output$airspeed_u <- colSums(airspeed_u * get_quantity(x, "dens")[index, ], na.rm = TRUE) / dens_quantity
+    output$airspeed_v <- colSums(airspeed_v * get_quantity(x, "dens")[index, ], na.rm = TRUE) / dens_quantity
+  }
+
   class(output) <- c("vpi", "data.frame")
   rownames(output) <- NULL
   attributes(output)$alt_min <- alt_min

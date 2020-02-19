@@ -4,9 +4,18 @@
 \alias{as.data.frame.vp}
 \title{Convert a vertical profile (\code{vp}) to a Data Frame}
 \usage{
-\method{as.data.frame}{vp}(x, row.names = NULL, optional = FALSE,
-  quantities = names(x$data), suntime = TRUE, geo = TRUE,
-  elev = -0.268, lat = NULL, lon = NULL, ...)
+\method{as.data.frame}{vp}(
+  x,
+  row.names = NULL,
+  optional = FALSE,
+  quantities = names(x$data),
+  suntime = TRUE,
+  geo = TRUE,
+  elev = -0.268,
+  lat = NULL,
+  lon = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class \code{vp}.}
@@ -56,8 +65,14 @@ all thresholded by \link{sd_vvp_threshold}
 # load an example vertical profile time series object
 data(example_vp)
 
+# print some summary information
+example_vp
+
 # convert the object to a data.frame
 df <- as.data.frame(example_vp)
+
+# print the data.frame to console
+df
 
 # do not compute sunrise/sunset information
 df <- as.data.frame(example_vp, suntime = FALSE)

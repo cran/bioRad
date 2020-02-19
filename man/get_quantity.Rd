@@ -20,7 +20,7 @@ get_quantity(x, quantity)
 
 \item{quantity}{A profile quantity, one of:
 \itemize{
- \item{\code{"HGHT"}}{}
+ \item{\code{"height"}}{}
  \item{\code{"u"}}{}
  \item{\code{"v"}}{}
  \item{\code{"w"}}{}
@@ -55,4 +55,11 @@ This function grabs any of the data quantities stored in
 \link[=summary.vp]{vp} or \link[=summary.vpts]{vpts} objects. See the
 documentation of the vertical profile \link[=summary.vp]{vp} class for a
 description of each of these quantities.
+}
+\examples{
+# load example profile
+data(example_vp)
+
+# extract the animal density ("dens") quantity:
+get_quantity(example_vp, "dens")
 }

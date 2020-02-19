@@ -11,8 +11,7 @@
 \usage{
 check_night(x, ..., elev = -0.268)
 
-\method{check_night}{default}(x, lon, lat, ..., tz = "UTC",
-  elev = -0.268)
+\method{check_night}{default}(x, lon, lat, ..., tz = "UTC", elev = -0.268)
 
 \method{check_night}{vp}(x, ..., elev = -0.268)
 
@@ -25,7 +24,7 @@ check_night(x, ..., elev = -0.268)
 \arguments{
 \item{x}{\code{pvol}, \code{vp} or \code{vpts},
 or a date inheriting from class \code{POSIXct} or a string
-interpretable by \link[base]{as.POSIXct}.}
+interpretable by \link{as.POSIXct}.}
 
 \item{...}{optional lat,lon arguments.}
 
@@ -65,5 +64,6 @@ check_night("2016-01-01 00:00", 5, 53)
 
 # check on bioRad objects directly:
 check_night(example_vp)
+
 check_night(example_vpts)
 }

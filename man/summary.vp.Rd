@@ -4,7 +4,7 @@
 \alias{summary.vp}
 \alias{is.vp}
 \alias{dim.vp}
-\title{Class \code{vp}: a vertical profile of birds}
+\title{Class \code{vp}: a vertical profile of animals}
 \usage{
 \method{summary}{vp}(object, ...)
 
@@ -25,8 +25,7 @@ For \code{is.vp}: \code{TRUE} if its argument is of class \code{vp}.
 For \code{dim.vp}: dimensions of the profile data.
 }
 \description{
-Class \code{vp} for a vertical profile of birds, and its associated R base
-functions.
+Class \code{vp} for a vertical profile of animals
 }
 \details{
 An object of class \code{vp} contains a vertical profile. A vertical profile
@@ -44,7 +43,7 @@ A \code{vp} object is a list containing
  \item{\strong{\code{datetime}}}{the nominal time of the profile}
  \item{\strong{\code{data}}}{the profile data, a list containing:
    \describe{
-       \item{\code{HGHT}}{height above mean sea level [m]. Alt. bin from HGHT to HGHT+interval)}
+       \item{\code{height}}{height above mean sea level [m]. Alt. bin from height to height+interval)}
        \item{\code{u}}{speed component west to east [m/s]}
        \item{\code{v}}{speed component north to south [m/s]}
        \item{\code{w}}{vertical speed (unreliable!) [m/s]}
@@ -52,17 +51,44 @@ A \code{vp} object is a list containing
        \item{\code{dd}}{direction [degrees, clockwise from north]}
        \item{\code{sd_vvp}}{VVP radial velocity standard deviation [m/s]}
        \item{\code{gap}}{Angular data gap detected [T/F]}
-       \item{\code{dbz}}{Bird reflectivity factor [dBZ]}
-       \item{\code{eta}}{Bird reflectivity [cm^2/km^3]}
-       \item{\code{dens}}{Bird density [birds/km^3]}
+       \item{\code{dbz}}{Animal reflectivity factor [dBZ]}
+       \item{\code{eta}}{Animal reflectivity [cm^2/km^3]}
+       \item{\code{dens}}{Animal density [animals/km^3]}
        \item{\code{DBZH}}{Total reflectivity factor (bio+meteo scattering) [dBZ]}
-       \item{\code{n}}{number of points VVP bird velocity analysis (u,v,w,ff,dd)}
+       \item{\code{n}}{number of points VVPvelocity analysis (u,v,w,ff,dd)}
        \item{\code{n_all}}{number of points VVP st.dev. estimate (sd_vvp)}
-       \item{\code{n_dbz}}{number of points bird density estimate (dbz,eta,dens)}
+       \item{\code{n_dbz}}{number of points density estimate (dbz,eta,dens)}
        \item{\code{n_dbz_all}}{number of points total reflectivity estimate (DBZH)}
    }
  }
  \item{\strong{\code{attributes}}}{list with the profile's \code{\\what},
  \code{\\where} and \code{\\how} attributes}
 }
+
+\subsection{Conventions}{
+  \itemize{
+    \item \code{NA} Maps to 'nodata' in the ODIM convention: value to denote areas void of data
+     (never radiated)
+    \item \code{NaN} Maps to 'undetect' in the ODIM convention: denote areas below the measurement
+    detection threshold (radiated but nothing detected). The value is also used when there are too
+    few datapoints to calculate a quantity.
+    \item \code{0} Maps to 0 in the ODIM convention: denote areas where the quantity has a measured
+     value of zero (radiated and value zero detected or inferred).
+  }
+  It depends on a radar's detection threshold or signal to noise ratio whether it safe to assume
+  an 'undetect' is equivalent to zero. When dealing with close range data only (within 35 km), it
+  is typically safe to assume aerial densities (dens) and reflectivities (eta) are in fact zero
+  in case of undetects.
+}
+}
+\examples{
+# load example vp object
+data(example_vp)
+example_vp
+
+# check that the object is a vp object:
+is.vp(example_vp)
+
+# dimensions of the vp object:
+dim(example_vp)
 }

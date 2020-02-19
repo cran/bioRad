@@ -70,6 +70,8 @@ plot.vpts <- function(x, xlab = "time", ylab = "height [m]", quantity = "dens",
   stopifnot(inherits(x, "vpts"))
   stopifnot(quantity %in% c("dens", "eta", "dbz", "DBZH"))
 
+  if (hasArg("param")) stop("unknown function argument 'param`. Did you mean `quantity`?")
+
   # deprecate function arguments
   if (!missing(barbs.h)) {
     warning("argument barbs.h is deprecated; please use barbs_height instead.",
@@ -104,6 +106,21 @@ plot.vpts <- function(x, xlab = "time", ylab = "height [m]", quantity = "dens",
       "Irregular time-series: missing profiles will not be visible.",
       "Use 'regularize_vpts' to make time series regular."
     )
+  }
+
+  assert_that(is.flag(log))
+  if (!missing(zlim)) {
+    assert_that(is.numeric(zlim), length(zlim) == 2, zlim[2] > zlim[1])
+    if (log) {
+      assert_that(zlim[1] > 0)
+    }
+  }
+
+  # remove profiles with duplicate timestamps:
+  index_duplicates <- which(x$timesteps == 0) + 1
+  if (length(index_duplicates) > 0) {
+    warning(paste("Dropped", length(index_duplicates), "profiles with duplicate datetime values"))
+    x <- x[-index_duplicates]
   }
 
   # prepare zlim, ticks and legendticks
@@ -202,9 +219,9 @@ plot.vpts <- function(x, xlab = "time", ylab = "height [m]", quantity = "dens",
   # plotdata[is.na2(plotdata)]=(breaks[1]+breaks[2])/2
   # when calculate_vp stdout also differentiates between NA and NaN:
   plotdata[is.na(plotdata)] <- (breaks[2] + breaks[3]) / 2
-
+  stopifnot(!is.null(interval <- x$attributes$where$interval))
   # plot the image
-  image.plot(x$datetime, x$heights, plotdata,
+  image.plot(x$datetime, x$height + interval / 2, plotdata,
     col = plot_colors, xlab = xlab,
     ylab = ylab, axis.args = axis.args, breaks = breaks,
     zlim = zlim, main = main, ...
@@ -218,10 +235,11 @@ plot.vpts <- function(x, xlab = "time", ylab = "height [m]", quantity = "dens",
       t.barbs <- seq(x$datetime[1], tail(x$datetime, 1), length.out = barbs_time)
     }
     if ("ylim" %in% names(args)) {
-      h.barbs <- seq(min(args$ylim), max(args$ylim), length.out = barbs_height)
+      h.barbs <- seq(min(args$ylim), max(args$ylim), length.out = barbs_height + 1)
     } else {
-      h.barbs <- seq(x$heights[1], tail(x$heights, 1), length.out = barbs_height)
+      h.barbs <- seq(x$height[1], tail(x$height, 1) + interval, length.out = barbs_height + 1)
     }
+    h.barbs <- h.barbs[-length(h.barbs)] + diff(h.barbs) / 2
     barbdata <- expand.grid(date = t.barbs, height = h.barbs)
     barbdata$indext <- sapply(
       barbdata$date,
@@ -229,7 +247,7 @@ plot.vpts <- function(x, xlab = "time", ylab = "height [m]", quantity = "dens",
     )
     barbdata$indexh <- sapply(
       barbdata$height,
-      function(y) which.min(abs(x$heights - y))
+      function(y) which.min(abs(x$height + interval / 2 - y))
     )
     barbdata$ff <- mapply(
       function(xx, yy) x$data$ff[xx, yy], barbdata$indexh, barbdata$indext
@@ -242,7 +260,7 @@ plot.vpts <- function(x, xlab = "time", ylab = "height [m]", quantity = "dens",
     )
     barbdata <- barbdata[barbdata$dens > barbs_dens_min, ]
     plot_wind_barbs(barbdata$date, barbdata$height, 180 + barbdata$dd,
-      2 * barbdata$ff,
+      barbdata$ff,
       cex = 0.7
     )
   }
@@ -306,73 +324,74 @@ plot_wind_barbs <- function(cx, cy, direction = 0, speed = NA,
         X2 <- 0
         Y1 <- 0
         Y2 <- 5
-        if (spd >= 5 & spd < 10) {
+
+        if (spd >= 1.25 & spd < 3.75) {
           X1 <- c(X1, 0)
           X2 <- c(X2, 1)
           Y1 <- c(Y1, 5)
           Y2 <- c(Y2, 5)
         }
-        if (spd >= 10 & spd < 15) {
+        if (spd >= 3.75 & spd < 6.25) {
           X1 <- c(X1, 0)
           X2 <- c(X2, 2)
           Y1 <- c(Y1, 5)
           Y2 <- c(Y2, 5)
         }
-        if (spd >= 15 & spd < 20) {
+        if (spd >= 6.25 & spd < 8.75) {
           X1 <- c(X1, 0, 0)
           X2 <- c(X2, 1, 2)
           Y1 <- c(Y1, 4, 5)
           Y2 <- c(Y2, 4, 5)
         }
-        if (spd >= 20 & spd < 25) {
+        if (spd >= 8.75 & spd < 11.25) {
           X1 <- c(X1, 0, 0)
           X2 <- c(X2, 2, 2)
           Y1 <- c(Y1, 4, 5)
           Y2 <- c(Y2, 4, 5)
         }
-        if (spd >= 25 & spd < 30) {
+        if (spd >= 11.25 & spd < 13.75) {
           X1 <- c(X1, 0, 0, 0)
           X2 <- c(X2, 1, 2, 2)
           Y1 <- c(Y1, 3, 4, 5)
           Y2 <- c(Y2, 3, 4, 5)
         }
-        if (spd >= 30 & spd < 35) {
+        if (spd >= 13.75 & spd < 16.25) {
           X1 <- c(X1, 0, 0, 0)
           X2 <- c(X2, 2, 2, 2)
           Y1 <- c(Y1, 3, 4, 5)
           Y2 <- c(Y2, 3, 4, 5)
         }
-        if (spd >= 35 & spd < 40) {
+        if (spd >= 16.25 & spd < 18.75) {
           X1 <- c(X1, 0, 0, 0, 0)
           X2 <- c(X2, 1, 2, 2, 2)
           Y1 <- c(Y1, 2, 3, 4, 5)
           Y2 <- c(Y2, 2, 3, 4, 5)
         }
-        if (spd >= 40 & spd < 45) {
+        if (spd >= 18.75 & spd < 21.25) {
           X1 <- c(X1, 0, 0, 0, 0)
           X2 <- c(X2, 2, 2, 2, 2)
           Y1 <- c(Y1, 2, 3, 4, 5)
           Y2 <- c(Y2, 2, 3, 4, 5)
         }
-        if (spd >= 45 & spd < 50) {
+        if (spd >= 21.25 & spd < 23.75) {
           X1 <- c(X1, 0, 0, 0, 0, 0)
           X2 <- c(X2, 1, 2, 2, 2, 2)
           Y1 <- c(Y1, 1, 2, 3, 4, 5)
           Y2 <- c(Y2, 1, 2, 3, 4, 5)
         }
-        if (spd >= 50 & spd < 55) {
+        if (spd >= 23.75 & spd < 26.25) {
           X1 <- c(X1, 0, 0)
           X2 <- c(X2, 2, 2)
           Y1 <- c(Y1, 4, 5)
           Y2 <- c(Y2, 4.5, 4.5)
         }
-        if (spd >= 55 & spd < 60) {
+        if (spd >= 26.25 & spd < 28.75) {
           X1 <- c(X1, 0, 0, 0)
           X2 <- c(X2, 1, 2, 2)
           Y1 <- c(Y1, 3, 4, 5)
           Y2 <- c(Y2, 3, 4.5, 4.5)
         }
-        if (spd >= 60 & spd < 65) {
+        if (spd >= 28.75 & spd < 31.25) {
           X1 <- c(X1, 0, 0, 0)
           X2 <- c(X2, 2, 2, 2)
           Y1 <- c(Y1, 3, 4, 5)

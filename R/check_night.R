@@ -7,7 +7,7 @@
 #'
 #' @param x \code{pvol}, \code{vp} or \code{vpts},
 #' or a date inheriting from class \code{POSIXct} or a string
-#' interpretable by \link[base]{as.POSIXct}.
+#' interpretable by \link{as.POSIXct}.
 #' @param lon numeric. Longitude in decimal degrees.
 #' @param lat numeric. Latitude in decimal degrees.
 #' @param tz character. Time zone. Ignored when \code{date} already has an associated time zone
@@ -33,9 +33,10 @@
 #' @examples
 #' # check if it is night at UTC midnight in the Netherlands on January 1st:
 #' check_night("2016-01-01 00:00", 5, 53)
-#' 
+#'
 #' # check on bioRad objects directly:
 #' check_night(example_vp)
+#'
 #' check_night(example_vpts)
 check_night <- function(x, ..., elev = -0.268) {
   UseMethod("check_night", x)

@@ -4,8 +4,15 @@
 \alias{plot.scan}
 \title{Plot a scan (\code{scan}) in polar coordinates}
 \usage{
-\method{plot}{scan}(x, param, xlim = c(0, 100), ylim = c(0, 360),
-  zlim = c(-20, 20), ...)
+\method{plot}{scan}(
+  x,
+  param,
+  xlim = c(0, 1e+05),
+  ylim = c(0, 360),
+  zlim = c(-20, 20),
+  na.value = "transparent",
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class \code{scan}.}
@@ -18,6 +25,8 @@
 
 \item{zlim}{The range of parameter values to plot.}
 
+\item{na.value}{\link[ggplot2]{ggplot} argument setting the plot color of NA values}
+
 \item{...}{Arguments passed to low level \link[ggplot2]{ggplot} function.}
 }
 \description{
@@ -29,6 +38,7 @@ Available scan parameters for plotting can by printed to screen
 by \code{summary(x)}. Commonly available parameters are:
 \describe{
  \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor [dBZ]}
+ \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor [dBZ]}
  \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity [m/s]. Radial
    velocities towards the radar are negative, while radial velocities away
    from the radar are positive}
@@ -45,11 +55,18 @@ model (ODIM), see Table 16 in the
 \examples{
 # load an example scan:
 data(example_scan)
+
 # print to screen the available scan parameters
 summary(example_scan)
+
 # make ppi for the scan
 # plot the reflectivity param:
 plot(example_scan, param = "DBZH")
-# change the range of reflectivities to plot to -30 to 50 dBZ:
-plot(example_scan, param = "DBZH", zlim = c(-30, 50))
+\dontrun{
+# change the range of reflectivities to plot, from -10 to 10 dBZ:
+plot(example_scan, param = "DBZH", zlim = c(-10, 10))
+
+# change the scale name and colour scheme, using viridis colors:
+plot(example_scan, param = "DBZH", zlim = c(-10, 10)) + viridis::scale_fill_viridis(name = "dBZ")
+}
 }

@@ -3,7 +3,7 @@
 #' @param x A vp or vpts object.
 #' @param quantity A profile quantity, one of:
 #' \itemize{
-#'  \item{\code{"HGHT"}}{}
+#'  \item{\code{"height"}}{}
 #'  \item{\code{"u"}}{}
 #'  \item{\code{"v"}}{}
 #'  \item{\code{"w"}}{}
@@ -27,6 +27,12 @@
 #' description of each of these quantities.
 #'
 #' @export
+#' @examples
+#' # load example profile
+#' data(example_vp)
+#'
+#' # extract the animal density ("dens") quantity:
+#' get_quantity(example_vp, "dens")
 get_quantity <- function(x, quantity) {
   UseMethod("get_quantity", x)
 }
@@ -37,7 +43,7 @@ get_quantity <- function(x, quantity) {
 get_quantity.vp <- function(x, quantity = "dens") {
   stopifnot(inherits(x, "vp"))
   output <- x$data[quantity][, 1]
-  names(output) <- x$data$HGHT
+  names(output) <- x$data$height
 
   if (quantity == "eta") {
     output[x$data$sd_vvp < sd_vvp_threshold(x)] <- 0
@@ -74,7 +80,7 @@ get_quantity.vpts <- function(x, quantity = "dens") {
   ## this function should checkout both the gap and sd_vvp flags
   stopifnot(inherits(x, "vpts"))
   output <- x$data[quantity][[1]]
-  rownames(output) <- x$heights
+  rownames(output) <- x$height
   colnames(output) <- as.character(x$datetime)
   if (quantity == "eta") {
     output[x$data$sd_vvp < sd_vvp_threshold(x)] <- 0

@@ -15,7 +15,7 @@
 #' therefore the moment of sunrise/sunset corresponds to half that elevation
 #' at -0.268 degrees.
 #'
-#' This is a convenience function mapping to \link[maptools]{crepuscule}.
+#' This is a convenience function mapping to \link{crepuscule}.
 #'
 #' Approximate astronomical formula are used, therefore the moment of
 #' sunrise / sunset may be off by a few minutes
@@ -23,8 +23,10 @@
 #' @examples
 #' # sunrise in the Netherlands
 #' sunrise("2016-01-01", 5, 53)
+#'
 #' # sunset in the Netherlands
 #' sunset("2016-01-01", 5, 53)
+#'
 #' # civil twilight in Ithaca, NY, today
 #' sunrise(Sys.time(), -76.5, 42.4, elev = -6)
 #' @name sunrise_sunset

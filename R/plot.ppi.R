@@ -9,6 +9,7 @@
 #' @param ylim Range of y values to plot.
 #' @param ratio Aspect ratio between x and y scale.
 #' @param zlim The range of parameter values to plot.
+#' @param na.value \link[ggplot2]{ggplot} argument setting the plot color of NA values
 #' @param ... Arguments passed to low level \link[ggplot2]{ggplot} function.
 #'
 #' @method plot ppi
@@ -20,6 +21,7 @@
 #' by \code{summary(x)}. Commonly available parameters are:
 #' \describe{
 #'  \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor [dBZ]}
+#'  \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor [dBZ]}
 #'  \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity [m/s]. Radial
 #'  velocities towards the radar are negative, while radial velocities away
 #'  from the radar are positive}
@@ -35,19 +37,29 @@
 #' @examples
 #' # load an example scan:
 #' data(example_scan)
+#'
 #' # print to screen the available scan parameters:
 #' summary(example_scan)
+#'
 #' # make ppi for the scan
 #' ppi <- project_as_ppi(example_scan)
+#'
 #' # plot the first scan parameter, which in this case is "VRADH":
 #' plot(ppi)
+#'
 #' # plot the reflectivity parameter:
 #' plot(ppi, param = "DBZH")
-#' # change the range of reflectivities to plot to -30 to 50 dBZ:
-#' plot(ppi, param = "DBZH", zlim = c(-30, 50))
+#'
+#' # change the range of reflectivities to plot, from -10 to 10 dBZ:
+#' plot(ppi, param = "DBZH", zlim = c(-10, 10))
+#'
+#' # change the scale name and colour scheme, using viridis colors:
+#' plot(ppi, param = "DBZH", zlim = c(-10, 10)) + viridis::scale_fill_viridis(name = "dBZ")
 plot.ppi <- function(x, param, xlim, ylim, zlim = c(-20, 20),
-                     ratio = 1, ...) {
+                     ratio = 1, na.value = "transparent", ...) {
   stopifnot(inherits(x, "ppi"))
+
+  if (hasArg("quantity")) stop("unknown function argument 'quantity`. Did you mean `param`?")
 
   if (missing(param)) {
     if ("DBZH" %in% names(x$data)) {
@@ -55,22 +67,19 @@ plot.ppi <- function(x, param, xlim, ylim, zlim = c(-20, 20),
     } else {
       param <- names(x$data)[1]
     }
-  } else if (!is.character(param)) {
-    stop(
-      "'param' should be a character string with a valid scan",
-      "parameter name"
-    )
+  } else if (!see_if(param %in% names(x$data))) {
+    stop(paste("parameter '", param, "' not found in PPI", sep = ""))
   }
 
   if (missing(zlim)) {
-    zlim <- get_zlim(param)
+    zlim <- get_zlim(param, zlim)
   }
-  colorscale <- color_scale_fill(param, zlim)
+  colorscale <- color_scale_fill(param, zlim, na.value)
   # extract the scan parameter
   y <- NULL # dummy asignment to suppress devtools check warning
   data <- do.call(function(y) x$data[y], list(param))
   # convert to points
-  data <- data.frame(rasterToPoints(raster(data)))
+  data <- raster::as.data.frame(raster(data), xy = T)
   # bring z-values within plotting range
   index <- which(data[, 3] < zlim[1])
   if (length(index) > 0) {

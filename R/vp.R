@@ -1,7 +1,6 @@
-#' Class \code{vp}: a vertical profile of birds
+#' Class \code{vp}: a vertical profile of animals
 #'
-#' Class \code{vp} for a vertical profile of birds, and its associated R base
-#' functions.
+#' Class \code{vp} for a vertical profile of animals
 #'
 #' @rdname summary.vp
 #'
@@ -29,7 +28,7 @@
 #'  \item{\strong{\code{datetime}}}{the nominal time of the profile}
 #'  \item{\strong{\code{data}}}{the profile data, a list containing:
 #'    \describe{
-#'        \item{\code{HGHT}}{height above mean sea level [m]. Alt. bin from HGHT to HGHT+interval)}
+#'        \item{\code{height}}{height above mean sea level [m]. Alt. bin from height to height+interval)}
 #'        \item{\code{u}}{speed component west to east [m/s]}
 #'        \item{\code{v}}{speed component north to south [m/s]}
 #'        \item{\code{w}}{vertical speed (unreliable!) [m/s]}
@@ -37,19 +36,45 @@
 #'        \item{\code{dd}}{direction [degrees, clockwise from north]}
 #'        \item{\code{sd_vvp}}{VVP radial velocity standard deviation [m/s]}
 #'        \item{\code{gap}}{Angular data gap detected [T/F]}
-#'        \item{\code{dbz}}{Bird reflectivity factor [dBZ]}
-#'        \item{\code{eta}}{Bird reflectivity [cm^2/km^3]}
-#'        \item{\code{dens}}{Bird density [birds/km^3]}
+#'        \item{\code{dbz}}{Animal reflectivity factor [dBZ]}
+#'        \item{\code{eta}}{Animal reflectivity [cm^2/km^3]}
+#'        \item{\code{dens}}{Animal density [animals/km^3]}
 #'        \item{\code{DBZH}}{Total reflectivity factor (bio+meteo scattering) [dBZ]}
-#'        \item{\code{n}}{number of points VVP bird velocity analysis (u,v,w,ff,dd)}
+#'        \item{\code{n}}{number of points VVPvelocity analysis (u,v,w,ff,dd)}
 #'        \item{\code{n_all}}{number of points VVP st.dev. estimate (sd_vvp)}
-#'        \item{\code{n_dbz}}{number of points bird density estimate (dbz,eta,dens)}
+#'        \item{\code{n_dbz}}{number of points density estimate (dbz,eta,dens)}
 #'        \item{\code{n_dbz_all}}{number of points total reflectivity estimate (DBZH)}
 #'    }
 #'  }
 #'  \item{\strong{\code{attributes}}}{list with the profile's \code{\\what},
 #'  \code{\\where} and \code{\\how} attributes}
 #' }
+#'
+#' \subsection{Conventions}{
+#'   \itemize{
+#'     \item \code{NA} Maps to 'nodata' in the ODIM convention: value to denote areas void of data
+#'      (never radiated)
+#'     \item \code{NaN} Maps to 'undetect' in the ODIM convention: denote areas below the measurement
+#'     detection threshold (radiated but nothing detected). The value is also used when there are too
+#'     few datapoints to calculate a quantity.
+#'     \item \code{0} Maps to 0 in the ODIM convention: denote areas where the quantity has a measured
+#'      value of zero (radiated and value zero detected or inferred).
+#'   }
+#'   It depends on a radar's detection threshold or signal to noise ratio whether it safe to assume
+#'   an 'undetect' is equivalent to zero. When dealing with close range data only (within 35 km), it
+#'   is typically safe to assume aerial densities (dens) and reflectivities (eta) are in fact zero
+#'   in case of undetects.
+#' }
+#' @examples
+#' # load example vp object
+#' data(example_vp)
+#' example_vp
+#'
+#' # check that the object is a vp object:
+#' is.vp(example_vp)
+#'
+#' # dimensions of the vp object:
+#' dim(example_vp)
 summary.vp <- function(object, ...) {
   print.vp(object)
 }
@@ -83,6 +108,10 @@ dim.vp <- function(x) {
 #' @export
 print.vp <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
   stopifnot(inherits(x, "vp"))
+  if (!is.null(x$data$HGHT)) {
+    warning("obsolete vp object generated with bioRad version < 0.5.0.
+    vp objects should contain a list element 'data' containing a data.frame with column 'height' (instead of obsolete 'HGHT)")
+  }
   cat("               Vertical profile (class vp)\n\n")
   cat("       radar: ", x$radar, "\n")
   cat("      source: ", x$attributes$what$source, "\n")
@@ -132,13 +161,19 @@ print.vp <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
 #' @examples
 #' # load an example vertical profile time series object
 #' data(example_vp)
-#' 
+#'
+#' # print some summary information
+#' example_vp
+#'
 #' # convert the object to a data.frame
 #' df <- as.data.frame(example_vp)
-#' 
+#'
+#' # print the data.frame to console
+#' df
+#'
 #' # do not compute sunrise/sunset information
 #' df <- as.data.frame(example_vp, suntime = FALSE)
-#' 
+#'
 #' # override the latitude/longitude information stored in the object
 #' # when calculating sunrise / sunset
 #' df <- as.data.frame(example_vp, suntime = TRUE, lat = 50, lon = 4)
@@ -149,12 +184,12 @@ as.data.frame.vp <- function(x, row.names = NULL, optional = FALSE,
   stopifnot(inherits(x, "vp"))
   if (!is.null(row.names)) {
     if (is.character(row.names) & length(row.names) ==
-      length(x$datetime) * length(x$heights)) {
+      length(x$datetime) * length(x$height)) {
       rownames(output) <- row.names
     } else {
       stop(paste(
         "'row.names' is not a character vector of length",
-        length(x$datetime) * length(x$heights)
+        length(x$datetime) * length(x$height)
       ))
     }
   }
@@ -175,8 +210,8 @@ as.data.frame.vp <- function(x, row.names = NULL, optional = FALSE,
   # coerce data to a data frame
   output <- as.data.frame(x$data, optional = optional, ...)
   # add height and datetime as a column
-  output <- cbind(datetime = x$datetime, height = output$HGHT, output)
-  output$HGHT <- NULL
+  output <- cbind(datetime = x$datetime, height = output$height, output)
+  output$height <- NULL
   # add radar name
   output <- cbind(radar = x$radar, output, stringsAsFactors = FALSE)
   # add location information

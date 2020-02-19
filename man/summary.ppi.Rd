@@ -30,12 +30,17 @@ Class \code{ppi} for a plan position indicator, and its associated R base
 functions.
 }
 \details{
+\code{ppi} objects are generated from elevation scans (\code{scan} objects)
+with \link{project_as_ppi} or from polar volumes with \link{integrate_to_ppi},
+producing projections of the radar data onto the earth's surface.
+
 An object of class \code{ppi} is a list containing:
 \describe{
  \item{\code{data}}{an object of class \link[sp]{SpatialGridDataFrame}
    containing the georeferenced data. Commonly available parameters are:
     \describe{
      \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor [dBZ]}
+     \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor [dBZ]}
      \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity [m/s]. Radial
        velocities towards the radar are negative, while radial velocities
        away from the radar are positive}
@@ -60,4 +65,20 @@ An object of class \code{ppi} is a list containing:
     element of its parent scan or scan parameter.
   }
 }
+}
+\examples{
+# load example scan object
+data(example_scan)
+
+# calculate ppi object
+example_ppi <- project_as_ppi(example_scan)
+
+# print summary info:
+example_ppi
+
+# verify exampl_ppi is a ppi object:
+is.ppi(example_ppi)
+
+# ppi object dimensions:
+dim(example_ppi)
 }

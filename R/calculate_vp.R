@@ -3,12 +3,15 @@
 #' Calculates a vertical profile of biological scatterers (vp) from a polar volume (pvol)
 #' using the algorithm \href{https://github.com/adokter/vol2bird/}{vol2bird} (Dokter et al. 2011).
 #'
-#' @param pvolfile A radar file containing a radar polar volume, either in
+#' @param file string or a vector of strings with radar file(s) for a radar polar volume.
+#' Provide either a single file containing a polar volume, or multiple files with single scans/sweeps.
+#' Data format should be either
 #' \href{https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf}{ODIM}
 #' format, which is the implementation of the OPERA data information model in
 #' \href{https://support.hdfgroup.org/HDF5/}{HDF5} format, or a format
 #' supported by the
-#' \href{http://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{RSL library}.
+#' \href{http://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{RSL library}, or Vaisala IRIS (IRIS RAW) format.
+#'
 #' @param vpfile character. Filename for the vertical profile to be
 #' generated in ODIM HDF5 format (optional).
 #' @param pvolfile_out character. Filename for the polar volume to be
@@ -22,7 +25,8 @@
 #' the Docker container.
 #' @param sd_vvp_threshold numeric. Lower threshold in radial velocity standard
 #' deviation (profile quantity \code{sd_vvp}) in m/s. Biological signals with
-#' \code{sd_vvp} < \code{sd_vvp_threshold} are set to zero.
+#' \code{sd_vvp} < \code{sd_vvp_threshold} are set to zero. Defaults to 2 m/s
+#' for C-band radars and 1 m/s for S-band radars if not specified.
 #' @param rcs numeric. Radar cross section per bird in cm^2.
 #' @param dual_pol logical. When \code{TRUE} use dual-pol mode, in which
 #' meteorological echoes are filtered using the correlation coefficient
@@ -34,8 +38,8 @@
 #' @param elev_max numeric. Maximum scan elevation in degrees.
 #' @param azim_min numeric. Minimum azimuth in degrees clockwise from north.
 #' @param azim_max numeric. Maximum azimuth in degrees clockwise from north.
-#' @param range_min numeric. Minimum range in km.
-#' @param range_max numeric. Maximum range in km.
+#' @param range_min numeric. Minimum range in m.
+#' @param range_max numeric. Maximum range in m.
 #' @param n_layer numeric. Number of altitude layers in the profile.
 #' @param h_layer numeric. Width of altitude layers in meter.
 #' @param nyquist_min numeric. Minimum Nyquist velocity of scans in m/s for
@@ -45,15 +49,19 @@
 #' velocities (below 25 m/s).
 #' @param dbz_quantity character. One of the available reflectivity factor
 #' quantities in the ODIM radar data format, e.g. DBZH, DBZV, TH, TV.
+#' @param mistnet logical. Whether to use MistNet segmentation model.
+#' @param local_install (optional) String with path to local vol2bird installation, see details.
+#' @param pvolfile deprecated argument renamed to \code{file}.
 #'
 #' @return A vertical profile object of class \link[=summary.vp]{vp}. When
 #' defined, output files \code{vpfile} and \code{pvolfile_out} are saved to disk.
 #'
 #' @export
 #'
-#' @details Requires a running \href{https://www.docker.com/}{Docker} daemon.
+#' @details Requires a running \href{https://www.docker.com/}{Docker} daemon
+#' (unless a local installation of vol2bird is specified with \code{local_install}).
 #'
-#' Common arguments set by users are \code{pvolfile}, \code{vpfile},
+#' Common arguments set by users are \code{file}, \code{vpfile},
 #' \code{autoconf} and \code{mount}.
 #'
 #' Turn on \code{autoconf} to automatically select the optimal parameters for a
@@ -82,7 +90,8 @@
 #' to zero (see vertical profile \link[=summary.vp]{vp} class). This threshold
 #' might be dependent on radar processing settings. Results from validation
 #' campaigns so far indicate that 2 m/s is the best choice for this parameter
-#' for most weather radars.
+#' for most C-band weather radars, which is used as the C-band default. For S-band,
+#' the default threshold is 1 m/s.
 
 #' The algorithm has been tested and developed for altitude layers with
 #' \code{h_layer} = 200 m. Smaller widths are not recommended as they may cause
@@ -98,7 +107,7 @@
 #'
 #' Using default values of \code{range_min} and \code{range_max} is
 #' recommended. Ranges closer than 5 km tend to be contaminated by ground
-#' clutter, while range gates beyond 25 km become too wide to resolve the
+#' clutter, while range gates beyond 35 km become too wide to resolve the
 #' default altitude layer width of 200 meter (see \link{beam_width}).
 #'
 #' For dealiasing, the torus mapping method by Haase et al. is used.
@@ -113,49 +122,91 @@
 #' volume files to be processed, such that \code{calculate_vp} calls are as fast
 #' as possible.
 #'
+#' If you have installed the vol2bird algorithm locally (not possible on Windows)
+#' you can call vol2bird through this local installation (bypassing the Docker container),
+#' which will be faster. Simply point \code{local_install} to the path
+#' of your local vol2bird executable. Your local vol2bird executable will be called
+#' through a bash login shell. LD_LIBRARY_PATH (Linux) or DYLD_LIBRARY_PATH (Mac) should be
+#' correctly specified in your .bashrc or .bash_profile file
+#' and contain all the required shared libraries by vol2bird. See vol2bird installation
+#' pages on Github for details.
+#'
 #' @references
+#' Dokter et al. (2011) is the main reference for the profiling algorithm
+#' (vol2bird) underlying this function. When using the \code{mistnet} option,
+#' please also cite Lin et al. 2019. When de-aliasing data, please also cite Haase et al. 2004.
+#'
 #' \itemize{
+#'   \item Adriaan M. Dokter, Felix Liechti,
+#'   Herbert Stark, Laurent Delobbe, Pierre Tabary, Iwan Holleman, 2011.
+#'   Bird migration flight altitudes studied by a network of
+#'   operational weather radars,
+#'   Journal of the Royal Society Interface 8 (54), pp. 30--43.
+#'   \url{https://doi.org/10.1098/rsif.2010.0116}
 #'   \item Haase, G. and Landelius, T., 2004. Dealiasing of Doppler radar
 #'   velocities using a torus mapping. Journal of Atmospheric and Oceanic
-#'   Technology, 21(10), pp.1566-1573.
-#'   \item Bird migration flight altitudes studied by a network of
-#'   operational weather radars, Dokter et al., J. R. Soc. Interface 8 (54),
-#'   pp. 30--43, 2011. \url{https://doi.org/10.1098/rsif.2010.0116}
+#'   Technology, 21(10), pp.1566--1573.
+#'   \url{https://doi.org/10.1175/1520-0426(2004)021<1566:DODRVU>2.0.CO;2}
+#'   \item Tsung-Yu Lin, Kevin Winner, Garrett Bernstein, Abhay Mittal, Adriaan M. Dokter
+#'   Kyle G. Horton, Cecilia Nilsson, Benjamin M. Van Doren, Andrew Farnsworth
+#'   Frank A. La Sorte, Subhransu Maji, Daniel Sheldon, 2019.
+#'   MistNet: Measuring historical bird migration in the US
+#'   using archived weather radar data and convolutional neural networks
+#'   Methods in Ecology and Evolution 10 (11), pp. 1908--22.
+#'   \url{https://doi.org/10.1111/2041-210X.13280}
 #' }
 #'
 #' @examples
 #' # locate example polar volume file:
 #' pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
-#' 
+#'
 #' # copy to a home directory with read/write permissions:
 #' file.copy(pvolfile, "~/volume.h5")
-#' 
+#'
 #' # calculate the profile:
 #' \dontrun{
 #' profile <- calculate_vp("~/volume.h5")
+#' # print some summary info:
+#' profile
+#' # convert profile to a data.frame:
+#' as.data.frame(profile)
 #' }
-#' 
+#'
 #' # clean up:
 #' file.remove("~/volume.h5")
-calculate_vp <- function(pvolfile, vpfile = "", pvolfile_out = "",
+calculate_vp <- function(file, vpfile = "", pvolfile_out = "",
                          autoconf = FALSE, verbose = FALSE,
-                         mount = dirname(pvolfile), sd_vvp_threshold = 2,
+                         mount = dirname(file[1]), sd_vvp_threshold,
                          rcs = 11, dual_pol = FALSE, rho_hv = 0.95, elev_min = 0,
                          elev_max = 90, azim_min = 0, azim_max = 360,
-                         range_min = 5000, range_max = 25000, n_layer = 20L,
+                         range_min = 5000, range_max = 35000, n_layer = 20L,
                          h_layer = 200, dealias = TRUE,
                          nyquist_min = if (dealias) 5 else 25,
-                         dbz_quantity = "DBZH") {
+                         dbz_quantity = "DBZH", mistnet = FALSE,
+                         local_install, pvolfile) {
+
+  # check for deprecated input argument pvolfile
+  calls <- names(sapply(match.call(), deparse))[-1]
+  if (any("pvolfile" %in% calls)) {
+    warning("argument 'pvolfile' is deprecated, please use 'file'")
+  }
+
   # check input arguments
-  if (!file.exists(pvolfile)) {
-    stop("No such file or directory")
+  for (filename in file) {
+    if (!file.exists(filename)) {
+      stop(paste("No such file:", filename))
+    }
   }
-  if (!is.numeric(sd_vvp_threshold) || sd_vvp_threshold <= 0) {
-    stop(
-      "invalid 'sd_vvp_threshold' argument, radial velocity standard deviation ",
-      "threshold should be a positive numeric value"
-    )
+
+  if (!missing(sd_vvp_threshold)) {
+    if (!is.numeric(sd_vvp_threshold) || sd_vvp_threshold <= 0) {
+      stop(
+        "invalid 'sd_vvp_threshold' argument, radial velocity standard deviation ",
+        "threshold should be a positive numeric value"
+      )
+    }
   }
+
   if (!is.numeric(rcs) || rcs <= 0) {
     stop(
       "invalid 'rcs' argument, radar cross section should be a ",
@@ -225,6 +276,13 @@ calculate_vp <- function(pvolfile, vpfile = "", pvolfile_out = "",
   if (!(dbz_quantity %in% c("DBZ", "DBZH", "DBZV", "TH", "TV"))) {
     warning(paste("expecting 'dbz_quantity' to be one of DBZ, DBZH, DBZV, TH, TV"))
   }
+
+  if (!is.logical(mistnet)) {
+    stop("invalid 'mistnet' argument, should be logical")
+  }
+  if (mistnet && !.pkgenv$mistnet) {
+    stop("MistNet has not been installed, see update_docker() for install instructions")
+  }
   if (!is.logical(dealias)) {
     stop("invalid 'dealias' argument, should be logical")
   }
@@ -237,12 +295,13 @@ calculate_vp <- function(pvolfile, vpfile = "", pvolfile_out = "",
       mount
     ))
   }
-  if (!.pkgenv$docker) {
+  if (!.pkgenv$docker && missing(local_install)) {
     stop(
       "Requires a running Docker daemon.\nTo enable calculate_vp, start ",
       "your local Docker daemon, and run 'check_docker()' in R\n"
     )
   }
+
   if (!length(autoconf) == 1 || !is.logical(autoconf)) {
     stop("autoconf argument should be one of TRUE or FALSE")
   }
@@ -253,26 +312,34 @@ calculate_vp <- function(pvolfile, vpfile = "", pvolfile_out = "",
     stop(paste("output directory", dirname(vpfile), "not found"))
   }
 
-  filedir <- dirname(normalizePath(pvolfile, winslash = "/"))
+  filedir <- dirname(normalizePath(file[1], winslash = "/"))
   if (!grepl(normalizePath(mount, winslash = "/"), filedir, fixed = TRUE)) {
     stop(
       "mountpoint 'mount' has to be a parent directory ",
-      "of input file 'pvolfile'"
+      "of input file 'file'"
     )
   }
+
+  # check whether vol2bird container supports multiple input files
+  multi_file_support <- !is.null(.pkgenv$vol2bird_version) && !is.na(.pkgenv$vol2bird_version) && .pkgenv$vol2bird_version > numeric_version("0.3.20")
+  if (!missing(local_install)) multi_file_support <- TRUE
+
+  if (length(file) > 1 && !multi_file_support) stop("Current installation does not support multiple input files. Provide a single input file containing a polar volume")
 
   profile.tmp <- tempfile(tmpdir = filedir)
   if (file.access(filedir, mode = 2) < 0) {
     stop(paste("vol2bird requires write permission in", filedir))
   }
-  if (mount_docker_container(normalizePath(mount, winslash = "/")) != 0) {
-    stop(paste("failed to start vol2bird Docker container"))
+  if (missing(local_install)) {
+    if (mount_docker_container(normalizePath(mount, winslash = "/")) != 0) {
+      stop(paste("failed to start vol2bird Docker container"))
+    }
   }
 
   # put options file in place, to be read by vol2bird container
   opt.values <- c(
     as.character(c(
-      sd_vvp_threshold, rcs, rho_hv, elev_min, elev_max,
+      rcs, rho_hv, elev_min, elev_max,
       azim_min, azim_max, range_min, range_max,
       n_layer, h_layer, nyquist_min, dbz_quantity
     )),
@@ -281,26 +348,43 @@ calculate_vp <- function(pvolfile, vpfile = "", pvolfile_out = "",
   )
 
   opt.names <- c(
-    "STDEV_BIRD", "SIGMA_BIRD", "RHOHVMIN", "ELEVMIN", "ELEVMAX",
+    "SIGMA_BIRD", "RHOHVMIN", "ELEVMIN", "ELEVMAX",
     "AZIMMIN", "AZIMMAX", "RANGEMIN", "RANGEMAX", "NLAYER",
     "HLAYER", "MIN_NYQUIST_VELOCITY", "DBZTYPE", "DUALPOL",
     "DEALIAS_VRAD"
   )
+
+  if (!missing(sd_vvp_threshold)) {
+    opt.values <- c(as.character(sd_vvp_threshold), opt.values)
+    opt.names <- c("STDEV_BIRD", opt.names)
+  }
+
+  if (mistnet) {
+    opt.values <- c(opt.values, "TRUE")
+    opt.names <- c(opt.names, "USE_MISTNET")
+  }
+
   opt <- data.frame(
     "option" = opt.names, "is" = rep("=", length(opt.values)),
     "value" = opt.values
   )
-  optfile <- paste(normalizePath(mount, winslash = "/"),
-    "/options.conf",
-    sep = ""
-  )
+  if (missing(local_install)) {
+    optfile <- paste(normalizePath(mount, winslash = "/"),
+      "/options.conf",
+      sep = ""
+    )
+  }
+  else {
+    optfile <- paste(getwd(), "/options.conf", sep = "")
+  }
 
   if (file.exists(optfile)) {
+    optfile_save <- paste(optfile, ".", format(Sys.time(), "%Y%m%d%H%M%S"), sep = "")
     warning(paste("options.conf file found in directory ", mount,
-      ". Renamed to options.conf.save to prevent overwrite...",
+      ". Renamed to ", basename(optfile_save), " to prevent overwrite...",
       sep = ""
     ))
-    file.rename(optfile, paste(optfile, ".saved", sep = ""))
+    file.rename(optfile, optfile_save)
   }
 
   # only use user configuration when autoconfiguration is off.
@@ -320,23 +404,42 @@ calculate_vp <- function(pvolfile, vpfile = "", pvolfile_out = "",
   if (nchar(prefix) > 0) {
     prefix <- paste(prefix, "/", sep = "")
   }
-  pvolfile_docker <- paste(prefix, basename(pvolfile), sep = "")
-  profile.tmp.docker <- paste(prefix, basename(profile.tmp), sep = "")
-  if (pvolfile_out != "") {
-    pvolfile_out_docker <- paste(prefix, basename(pvolfile_out), sep = "")
-  } else {
-    pvolfile_out_docker <- ""
+
+
+  # we have a valid vol2bird version > 0.3.20, so we can use multiple file inputs
+  if (multi_file_support) {
+    pvolfile_docker <- paste("-i ", prefix, basename(file), sep = "", collapse = " ")
+    profile.tmp.docker <- paste("-o ", prefix, basename(profile.tmp), sep = "")
+    if (pvolfile_out != "") {
+      pvolfile_out_docker <- paste("-p ", prefix, basename(pvolfile_out), sep = "")
+    } else {
+      pvolfile_out_docker <- ""
+    }
+  }
+  else { # only single polar volume file input supported
+    pvolfile_docker <- paste(prefix, basename(file), sep = "")
+    profile.tmp.docker <- paste(prefix, basename(profile.tmp), sep = "")
+    if (pvolfile_out != "") {
+      pvolfile_out_docker <- paste(prefix, basename(pvolfile_out), sep = "")
+    } else {
+      pvolfile_out_docker <- ""
+    }
   }
 
   # run vol2bird container
   if (.Platform$OS.type == "unix") {
-    result <- system(paste(
-      "docker exec vol2bird bash -c \"cd data && vol2bird ",
-      pvolfile_docker, profile.tmp.docker,
-      pvolfile_out_docker, "\""
-    ),
-    ignore.stdout = !verbose
-    )
+    if (missing(local_install)) {
+      result <- system(paste(
+        "docker exec vol2bird bash -c \"cd data && vol2bird ",
+        pvolfile_docker, profile.tmp.docker,
+        pvolfile_out_docker, "\""
+      ),
+      ignore.stdout = !verbose
+      )
+    }
+    else {
+      result <- system(paste("bash -l -c \"", local_install, file, profile.tmp, pvolfile_out, "\""), ignore.stdout = !verbose)
+    }
   } else {
     winstring <- paste(
       "docker exec vol2bird bash -c \"cd data && vol2bird ",
@@ -347,7 +450,7 @@ calculate_vp <- function(pvolfile, vpfile = "", pvolfile_out = "",
   }
   if (result != 0) {
     if (file.exists(optfile)) file.remove(optfile)
-    stop("failed to run vol2bird Docker container")
+    stop("failed to run vol2bird")
   }
 
   # read output into a vp object

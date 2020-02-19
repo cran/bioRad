@@ -24,14 +24,28 @@
 #' @export
 #'
 #' @examples
+#' # load example vp object:
 #' data(example_vp)
-#' plot(example_vp)
+#'
+#' # plot the animal density:
+#' plot(example_vp, quantity = "dens")
+#'
+#' # change the line color:
 #' plot(example_vp, line_col = "blue")
+#'
+#' # plot the ground speed:
+#' plot(example_vp, quantity = "ff")
+#'
+#' # plot the reflectivity factor of
+#' # all scatterers (including precipitation):
+#' plot(example_vp, quantity = "DBZH")
 plot.vp <- function(x, quantity = "dens",
                     xlab = expression("volume density [#/km"^3 * "]"),
                     ylab = "height [km]", line_col = "red",
                     line_lwd = 1, line.col = "red", line.lwd = 1, ...) {
   stopifnot(inherits(x, "vp"))
+
+  if (hasArg("param")) stop("unknown function argument 'param`. Did you mean `quantity`?")
 
   # deprecate function argument
   if (!missing(line.col)) {
@@ -77,6 +91,7 @@ plot.vp <- function(x, quantity = "dens",
   }
   # extract the data from the time series object
   pdat <- get_quantity(x, quantity)
-  plot(pdat, x$data$HGHT / 1000, xlab = xlab, ylab = ylab, ...)
-  points(pdat, x$data$HGHT / 1000, col = line_col, lwd = line_lwd, type = "l")
+  stopifnot(!is.null(interval <- x$attributes$where$interval))
+  plot(pdat, (x$data$height + interval / 2) / 1000, xlab = xlab, ylab = ylab, ...)
+  points(pdat, (x$data$height + interval / 2) / 1000, col = line_col, lwd = line_lwd, type = "l")
 }

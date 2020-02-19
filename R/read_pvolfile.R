@@ -1,7 +1,6 @@
 #' Read a polar volume (\code{pvol}) from file
 #'
-#' @param file A string containing the path to a vertical profile generated
-#' by \link[bioRad]{calculate_vp}.
+#' @param file A string containing the path to a polar volume file
 #' @param sort A logical value, when \code{TRUE} sort scans ascending
 #' by elevation.
 #' @param param An atomic vector of character strings, containing the names
@@ -34,6 +33,7 @@
 #' Commonly available parameters are:
 #' \describe{
 #'  \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor [dBZ]}
+#'  \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor [dBZ]}
 #'  \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity [m/s]. Radial
 #'    velocities towards the radar are negative, while radial velocities away
 #'    from the radar are positive}
@@ -46,27 +46,53 @@
 #'
 #' @examples
 #' # locate example volume file:
-#' pvol <- system.file("extdata", "volume.h5", package = "bioRad")
+#' pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
+#'
 #' # print the local path of the volume file:
-#' pvol
+#' pvolfile
+#'
 #' # load the file:
-#' vol <- read_pvolfile(pvol)
+#' example_pvol <- read_pvolfile(pvolfile)
+#'
 #' # print summary info for the loaded polar volume:
-#' vol
+#' example_pvol
+#'
 #' # print summary info for the scans in the polar volume:
-#' vol$scans
+#' example_pvol$scans
+#'
 #' # copy the first scan to a new object 'scan'
-#' scan <- vol$scans[[1]]
+#' scan <- example_pvol$scans[[1]]
+#'
 #' # print summary info for the new object:
 #' scan
 read_pvolfile <- function(file, param = c(
-                            "DBZH", "VRADH", "VRAD", "RHOHV",
-                            "ZDR", "PHIDP", "CELL"
+                            "DBZH", "DBZ", "VRADH", "VRAD", "TH", "T", "RHOHV",
+                            "ZDR", "PHIDP", "CELL", "BIOLOGY", "WEATHER", "BACKGROUND"
                           ),
                           sort = TRUE, lat, lon, height, elev_min = 0,
                           elev_max = 90, verbose = TRUE,
                           mount = dirname(file)) {
+  tryCatch(read_pvolfile_body(
+    file, param, sort, lat, lon,
+    height, elev_min, elev_max,
+    verbose, mount
+  ),
+  error = function(err) {
+    rhdf5::h5closeAll()
+    stop(err)
+  }
+  )
+}
 
+# this is the actual function read_pvolfile, without error handling that checks
+# for open hdf5 files
+read_pvolfile_body <- function(file, param = c(
+                                 "DBZH", "DBZ", "VRADH", "VRAD", "TH", "T", "RHOHV",
+                                 "ZDR", "PHIDP", "CELL", "BIOLOGY", "WEATHER", "BACKGROUND"
+                               ),
+                               sort = TRUE, lat, lon, height, elev_min = 0,
+                               elev_max = 90, verbose = TRUE,
+                               mount = dirname(file)) {
   # input checks
   if (!is.logical(sort)) {
     stop("'sort' should be logical")
@@ -144,18 +170,19 @@ read_pvolfile <- function(file, param = c(
     attribs.where <- h5readAttributes(file, "where")
   }
 
-  vol.lat <- attribs.where$lat
-  vol.lon <- attribs.where$lon
-  vol.height <- attribs.where$height
+  vol.lat <- c(attribs.where$lat) # need the c() to convert single element matrix to single element vector
+  vol.lon <- c(attribs.where$lon)
+  vol.height <- c(attribs.where$height)
   if (is.null(vol.lat)) {
     if (missing(lat)) {
       if (cleanup) {
         file.remove(file)
       }
       stop("latitude not found in file, provide 'lat' argument")
-    } else {
-      vol.lat <- lat
     }
+  }
+  if (!missing(lat)) {
+    vol.lat <- lat
   }
 
   if (is.null(vol.lon)) {
@@ -164,9 +191,10 @@ read_pvolfile <- function(file, param = c(
         file.remove(file)
       }
       stop("longitude not found in file, provide 'lon' argument")
-    } else {
-      vol.lon <- lon
     }
+  }
+  if (!missing(lon)) {
+    vol.lon <- lon
   }
 
   if (is.null(vol.height)) {
@@ -175,10 +203,12 @@ read_pvolfile <- function(file, param = c(
         file.remove(file)
       }
       stop("antenna height not found in file, provide 'height' argument")
-    } else {
-      vol.height <- height
     }
   }
+  if (!missing(height)) {
+    vol.height <- height
+  }
+
   geo <- list(lat = vol.lat, lon = vol.lon, height = vol.height)
 
   # convert some useful metadata
@@ -187,6 +217,11 @@ read_pvolfile <- function(file, param = c(
   )
   sources <- strsplit(attribs.what$source, ",")[[1]]
   radar <- gsub("RAD:", "", sources[which(grepl("RAD:", sources))])
+
+  # write height, lat, lon attributes (update with potential user-defined values)
+  attribs.where$height <- vol.height
+  attribs.where$lat <- vol.lat
+  attribs.where$lon <- vol.lon
 
   # read scan groups
   data <- lapply(
@@ -258,9 +293,9 @@ read_pvolfile_scan <- function(file, scan, param, radar, datetime, geo) {
   }
 
   # add attributes to geo list
-  geo$elangle <- attribs.where$elangle
-  geo$rscale <- attribs.where$rscale
-  geo$ascale <- 360 / attribs.where$nrays
+  geo$elangle <- c(attribs.where$elangle)
+  geo$rscale <- c(attribs.where$rscale)
+  geo$ascale <- c(360 / attribs.where$nrays)
 
   # read scan parameters
   quantities <- lapply(

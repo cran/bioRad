@@ -4,8 +4,16 @@
 \alias{plot.ppi}
 \title{Plot a plan position indicator (\code{ppi})}
 \usage{
-\method{plot}{ppi}(x, param, xlim, ylim, zlim = c(-20, 20), ratio = 1,
-  ...)
+\method{plot}{ppi}(
+  x,
+  param,
+  xlim,
+  ylim,
+  zlim = c(-20, 20),
+  ratio = 1,
+  na.value = "transparent",
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class \code{ppi}.}
@@ -20,6 +28,8 @@
 
 \item{ratio}{Aspect ratio between x and y scale.}
 
+\item{na.value}{\link[ggplot2]{ggplot} argument setting the plot color of NA values}
+
 \item{...}{Arguments passed to low level \link[ggplot2]{ggplot} function.}
 }
 \description{
@@ -31,6 +41,7 @@ Available scan paramaters for plotting can by printed to screen
 by \code{summary(x)}. Commonly available parameters are:
 \describe{
  \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor [dBZ]}
+ \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor [dBZ]}
  \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity [m/s]. Radial
  velocities towards the radar are negative, while radial velocities away
  from the radar are positive}
@@ -46,14 +57,22 @@ model (ODIM), see Table 16 in the
 \examples{
 # load an example scan:
 data(example_scan)
+
 # print to screen the available scan parameters:
 summary(example_scan)
+
 # make ppi for the scan
 ppi <- project_as_ppi(example_scan)
+
 # plot the first scan parameter, which in this case is "VRADH":
 plot(ppi)
+
 # plot the reflectivity parameter:
 plot(ppi, param = "DBZH")
-# change the range of reflectivities to plot to -30 to 50 dBZ:
-plot(ppi, param = "DBZH", zlim = c(-30, 50))
+
+# change the range of reflectivities to plot, from -10 to 10 dBZ:
+plot(ppi, param = "DBZH", zlim = c(-10, 10))
+
+# change the scale name and colour scheme, using viridis colors:
+plot(ppi, param = "DBZH", zlim = c(-10, 10)) + viridis::scale_fill_viridis(name = "dBZ")
 }

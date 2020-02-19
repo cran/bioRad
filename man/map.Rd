@@ -7,9 +7,24 @@
 \usage{
 map(x, ...)
 
-\method{map}{ppi}(x, map, param, alpha = 0.7, xlim, ylim, zlim = c(-20,
-  20), ratio, radar_size = 3, radar_color = "red", n_color = 1000,
-  radar.size = 3, radar.color = "red", n.color = 1000, ...)
+\method{map}{ppi}(
+  x,
+  map,
+  param,
+  alpha = 0.7,
+  xlim,
+  ylim,
+  zlim = c(-20, 20),
+  ratio,
+  radar_size = 3,
+  radar_color = "red",
+  n_color = 1000,
+  radar.size = 3,
+  radar.color = "red",
+  n.color = 1000,
+  palette = NA,
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class \code{ppi}.}
@@ -44,20 +59,24 @@ vector of length 2.}
 \item{radar.color}{Deprecated argument, use radar_color instead.}
 
 \item{n.color}{Deprecated argument, use n_color instead.}
+
+\item{palette}{(Optional) character vector of hexidecimal color values defining
+the plot color scale, e.g. output from \link[viridisLite]{viridis}}
 }
 \value{
 A ggmap object (a classed raster object with a bounding
 box attribute).
 }
 \description{
-Plot a ppi on a Google Maps, OpenStreetMap, Stamen Maps or Naver Map base
-layer map using \link[ggmap]{ggmap}
+Plot a ppi on a Stamen Maps, OpenStreetMap, Google Maps or Naver Map base
+layer map using \link[ggmap]{ggmap}.
 }
 \details{
 Available scan parameters for mapping can by printed to screen by
 \code{summary(x)}. Commonly available parameters are:
 \describe{
  \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor [dBZ]}
+ \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor [dBZ]}
  \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity [m/s]. Radial
  velocities towards the radar are negative, while radial velocities away
  from the radar are positive}
@@ -80,28 +99,31 @@ model (ODIM), see Table 16 in the
 data(example_scan)
 # make ppi's for all scan parameters in the scan
 ppi <- project_as_ppi(example_scan)
+\dontrun{
 # grab a basemap that matches the extent of the ppi:
-\dontrun{
-basemap <- download_basemap(ppi)
-}
+# using a gray-scale basemap:
+basemap <- download_basemap(ppi, maptype = "toner-lite")
+
 # map the radial velocity scan parameter onto the basemap:
-\dontrun{
 map(ppi, map = basemap, param = "VRADH")
-}
+
 # extend the plotting range of velocities, from -50 to 50 m/s:
-\dontrun{
 map(ppi, map = basemap, param = "VRADH", zlim = c(-50, 50))
-}
-# give the data less transparency:
-\dontrun{
-map(ppi, map = basemap, alpha = 0.9)
-}
+
+# map the reflectivity on a terrain basemap:
+basemap <- download_basemap(ppi, maptype = "terrain")
+map(ppi, map = basemap, param = "DBZH")
+
+# change the color palette, e.g. Viridis colors:
+map(ppi, map = basemap, param = "DBZH", palette = viridis::viridis(100), zlim=c(-10,10))
+
+# give the data more transparency:
+map(ppi, map = basemap, param = "DBZH", alpha = 0.3)
+
 # change the appearance of the symbol indicating the radar location:
-\dontrun{
-map(ppi, map = basemap, radar_size = 5, radar_color = "green")
-}
+map(ppi, map = basemap, radar_size = 5, radar_color = "blue")
+
 # crop the map:
-\dontrun{
 map(ppi, map = basemap, xlim = c(12.4, 13.2), ylim = c(56, 56.5))
 }
 }

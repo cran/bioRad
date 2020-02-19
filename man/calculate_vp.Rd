@@ -4,21 +4,42 @@
 \alias{calculate_vp}
 \title{Calculate a vertical profile (\code{vp}) from a polar volume (\code{pvol})}
 \usage{
-calculate_vp(pvolfile, vpfile = "", pvolfile_out = "",
-  autoconf = FALSE, verbose = FALSE, mount = dirname(pvolfile),
-  sd_vvp_threshold = 2, rcs = 11, dual_pol = FALSE, rho_hv = 0.95,
-  elev_min = 0, elev_max = 90, azim_min = 0, azim_max = 360,
-  range_min = 5000, range_max = 25000, n_layer = 20L,
-  h_layer = 200, dealias = TRUE, nyquist_min = if (dealias) 5 else
-  25, dbz_quantity = "DBZH")
+calculate_vp(
+  file,
+  vpfile = "",
+  pvolfile_out = "",
+  autoconf = FALSE,
+  verbose = FALSE,
+  mount = dirname(file[1]),
+  sd_vvp_threshold,
+  rcs = 11,
+  dual_pol = FALSE,
+  rho_hv = 0.95,
+  elev_min = 0,
+  elev_max = 90,
+  azim_min = 0,
+  azim_max = 360,
+  range_min = 5000,
+  range_max = 35000,
+  n_layer = 20L,
+  h_layer = 200,
+  dealias = TRUE,
+  nyquist_min = if (dealias) 5 else 25,
+  dbz_quantity = "DBZH",
+  mistnet = FALSE,
+  local_install,
+  pvolfile
+)
 }
 \arguments{
-\item{pvolfile}{A radar file containing a radar polar volume, either in
+\item{file}{string or a vector of strings with radar file(s) for a radar polar volume.
+Provide either a single file containing a polar volume, or multiple files with single scans/sweeps.
+Data format should be either
 \href{https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf}{ODIM}
 format, which is the implementation of the OPERA data information model in
 \href{https://support.hdfgroup.org/HDF5/}{HDF5} format, or a format
 supported by the
-\href{http://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{RSL library}.}
+\href{http://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{RSL library}, or Vaisala IRIS (IRIS RAW) format.}
 
 \item{vpfile}{character. Filename for the vertical profile to be
 generated in ODIM HDF5 format (optional).}
@@ -38,7 +59,8 @@ the Docker container.}
 
 \item{sd_vvp_threshold}{numeric. Lower threshold in radial velocity standard
 deviation (profile quantity \code{sd_vvp}) in m/s. Biological signals with
-\code{sd_vvp} < \code{sd_vvp_threshold} are set to zero.}
+\code{sd_vvp} < \code{sd_vvp_threshold} are set to zero. Defaults to 2 m/s
+for C-band radars and 1 m/s for S-band radars if not specified.}
 
 \item{rcs}{numeric. Radar cross section per bird in cm^2.}
 
@@ -58,9 +80,9 @@ filter meteorological scattering.}
 
 \item{azim_max}{numeric. Maximum azimuth in degrees clockwise from north.}
 
-\item{range_min}{numeric. Minimum range in km.}
+\item{range_min}{numeric. Minimum range in m.}
 
-\item{range_max}{numeric. Maximum range in km.}
+\item{range_max}{numeric. Maximum range in m.}
 
 \item{n_layer}{numeric. Number of altitude layers in the profile.}
 
@@ -75,6 +97,12 @@ scans to be included in the analysis.}
 
 \item{dbz_quantity}{character. One of the available reflectivity factor
 quantities in the ODIM radar data format, e.g. DBZH, DBZV, TH, TV.}
+
+\item{mistnet}{logical. Whether to use MistNet segmentation model.}
+
+\item{local_install}{(optional) String with path to local vol2bird installation, see details.}
+
+\item{pvolfile}{deprecated argument renamed to \code{file}.}
 }
 \value{
 A vertical profile object of class \link[=summary.vp]{vp}. When
@@ -85,9 +113,10 @@ Calculates a vertical profile of biological scatterers (vp) from a polar volume 
 using the algorithm \href{https://github.com/adokter/vol2bird/}{vol2bird} (Dokter et al. 2011).
 }
 \details{
-Requires a running \href{https://www.docker.com/}{Docker} daemon.
+Requires a running \href{https://www.docker.com/}{Docker} daemon
+(unless a local installation of vol2bird is specified with \code{local_install}).
 
-Common arguments set by users are \code{pvolfile}, \code{vpfile},
+Common arguments set by users are \code{file}, \code{vpfile},
 \code{autoconf} and \code{mount}.
 
 Turn on \code{autoconf} to automatically select the optimal parameters for a
@@ -116,7 +145,8 @@ value below the threshold \code{sd_vvp_threshold}, the bird density \code{dens} 
 to zero (see vertical profile \link[=summary.vp]{vp} class). This threshold
 might be dependent on radar processing settings. Results from validation
 campaigns so far indicate that 2 m/s is the best choice for this parameter
-for most weather radars.
+for most C-band weather radars, which is used as the C-band default. For S-band,
+the default threshold is 1 m/s.
 The algorithm has been tested and developed for altitude layers with
 \code{h_layer} = 200 m. Smaller widths are not recommended as they may cause
 instabilities of the volume velocity profiling (VVP) and dealiasing routines,
@@ -131,7 +161,7 @@ the bird's mass.
 
 Using default values of \code{range_min} and \code{range_max} is
 recommended. Ranges closer than 5 km tend to be contaminated by ground
-clutter, while range gates beyond 25 km become too wide to resolve the
+clutter, while range gates beyond 35 km become too wide to resolve the
 default altitude layer width of 200 meter (see \link{beam_width}).
 
 For dealiasing, the torus mapping method by Haase et al. is used.
@@ -145,6 +175,15 @@ recycled from one call to the next if subsequent calls share the same
 it is advised to choose a mountpoint that is a parent directory of all
 volume files to be processed, such that \code{calculate_vp} calls are as fast
 as possible.
+
+If you have installed the vol2bird algorithm locally (not possible on Windows)
+you can call vol2bird through this local installation (bypassing the Docker container),
+which will be faster. Simply point \code{local_install} to the path
+of your local vol2bird executable. Your local vol2bird executable will be called
+through a bash login shell. LD_LIBRARY_PATH (Linux) or DYLD_LIBRARY_PATH (Mac) should be
+correctly specified in your .bashrc or .bash_profile file
+and contain all the required shared libraries by vol2bird. See vol2bird installation
+pages on Github for details.
 }
 \examples{
 # locate example polar volume file:
@@ -156,18 +195,37 @@ file.copy(pvolfile, "~/volume.h5")
 # calculate the profile:
 \dontrun{
 profile <- calculate_vp("~/volume.h5")
+# print some summary info:
+profile
+# convert profile to a data.frame:
+as.data.frame(profile)
 }
 
 # clean up:
 file.remove("~/volume.h5")
 }
 \references{
+Dokter et al. (2011) is the main reference for the profiling algorithm
+(vol2bird) underlying this function. When using the \code{mistnet} option,
+please also cite Lin et al. 2019. When de-aliasing data, please also cite Haase et al. 2004.
+
 \itemize{
+  \item Adriaan M. Dokter, Felix Liechti,
+  Herbert Stark, Laurent Delobbe, Pierre Tabary, Iwan Holleman, 2011.
+  Bird migration flight altitudes studied by a network of
+  operational weather radars,
+  Journal of the Royal Society Interface 8 (54), pp. 30--43.
+  \url{https://doi.org/10.1098/rsif.2010.0116}
   \item Haase, G. and Landelius, T., 2004. Dealiasing of Doppler radar
   velocities using a torus mapping. Journal of Atmospheric and Oceanic
-  Technology, 21(10), pp.1566-1573.
-  \item Bird migration flight altitudes studied by a network of
-  operational weather radars, Dokter et al., J. R. Soc. Interface 8 (54),
-  pp. 30--43, 2011. \url{https://doi.org/10.1098/rsif.2010.0116}
+  Technology, 21(10), pp.1566--1573.
+  \url{https://doi.org/10.1175/1520-0426(2004)021<1566:DODRVU>2.0.CO;2}
+  \item Tsung-Yu Lin, Kevin Winner, Garrett Bernstein, Abhay Mittal, Adriaan M. Dokter
+  Kyle G. Horton, Cecilia Nilsson, Benjamin M. Van Doren, Andrew Farnsworth
+  Frank A. La Sorte, Subhransu Maji, Daniel Sheldon, 2019.
+  MistNet: Measuring historical bird migration in the US
+  using archived weather radar data and convolutional neural networks
+  Methods in Ecology and Evolution 10 (11), pp. 1908--22.
+  \url{https://doi.org/10.1111/2041-210X.13280}
 }
 }

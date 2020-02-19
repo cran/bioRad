@@ -4,13 +4,22 @@
 \alias{read_pvolfile}
 \title{Read a polar volume (\code{pvol}) from file}
 \usage{
-read_pvolfile(file, param = c("DBZH", "VRADH", "VRAD", "RHOHV", "ZDR",
-  "PHIDP", "CELL"), sort = TRUE, lat, lon, height, elev_min = 0,
-  elev_max = 90, verbose = TRUE, mount = dirname(file))
+read_pvolfile(
+  file,
+  param = c("DBZH", "DBZ", "VRADH", "VRAD", "TH", "T", "RHOHV", "ZDR", "PHIDP", "CELL",
+    "BIOLOGY", "WEATHER", "BACKGROUND"),
+  sort = TRUE,
+  lat,
+  lon,
+  height,
+  elev_min = 0,
+  elev_max = 90,
+  verbose = TRUE,
+  mount = dirname(file)
+)
 }
 \arguments{
-\item{file}{A string containing the path to a vertical profile generated
-by \link[bioRad]{calculate_vp}.}
+\item{file}{A string containing the path to a polar volume file}
 
 \item{param}{An atomic vector of character strings, containing the names
 of scan parameters to read. To read all scan parameters use 'all'.}
@@ -54,6 +63,7 @@ model (ODIM), see Table 16 in the
 Commonly available parameters are:
 \describe{
  \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor [dBZ]}
+ \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor [dBZ]}
  \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity [m/s]. Radial
    velocities towards the radar are negative, while radial velocities away
    from the radar are positive}
@@ -66,17 +76,23 @@ Commonly available parameters are:
 }
 \examples{
 # locate example volume file:
-pvol <- system.file("extdata", "volume.h5", package = "bioRad")
+pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
+
 # print the local path of the volume file:
-pvol
+pvolfile
+
 # load the file:
-vol <- read_pvolfile(pvol)
+example_pvol <- read_pvolfile(pvolfile)
+
 # print summary info for the loaded polar volume:
-vol
+example_pvol
+
 # print summary info for the scans in the polar volume:
-vol$scans
+example_pvol$scans
+
 # copy the first scan to a new object 'scan'
-scan <- vol$scans[[1]]
+scan <- example_pvol$scans[[1]]
+
 # print summary info for the new object:
 scan
 }

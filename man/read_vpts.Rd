@@ -4,13 +4,19 @@
 \alias{read_vpts}
 \title{Read a time series of vertical profiles (\code{vpts}) from file}
 \usage{
-read_vpts(file, radar, wavelength = "C")
+read_vpts(file, radar, lat, lon, height, wavelength = "C")
 }
 \arguments{
 \item{file}{A text file containing the standard output (stdout) generated
 by vol2bird (or the package function \code{calculate_vp}).}
 
 \item{radar}{A string containing a radar identifier.}
+
+\item{lat}{numeric. Latitude of the radar in decimal degrees.}
+
+\item{lon}{numeric. Longitude of the radar in decimal degrees.}
+
+\item{height}{numeric. Height above sea level of the radar antenna in meters.}
 
 \item{wavelength}{Radar wavelength in cm, or one of 'C' or 'S' for C-band
 and S-band radar, respectively, in which case C-band wavelength is assumed
@@ -25,11 +31,8 @@ Read a time series of vertical profiles (\code{vpts}) from file
 }
 \examples{
 # locate example file:
-vptszipfile <- system.file("extdata", "vpts.txt.zip", package = "bioRad")
-\dontrun{
-unzip(vptszipfile, "your/directory/and/file/name.txt")
+vptsfile <- system.file("extdata", "example_vpts.txt", package = "bioRad")
 # load time series:
-ts <- read_vpts("your/directory/and/file/name.txt", radar = "KBGM", wavelength = "S")
+ts <- read_vpts(vptsfile, radar = "KBGM", wavelength = "S")
 ts
-}
 }

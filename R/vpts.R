@@ -37,7 +37,7 @@
 #' \describe{
 #'  \item{\code{radar}}{string containing the radar identifier}
 #'  \item{\code{datetime}}{the \code{N} nominal times of the profiles (named \code{dates} in bioRad versions < 0.4.0)}
-#'  \item{\code{heights}}{the \code{M} heights of the layers in the profile}
+#'  \item{\code{height}}{the \code{M} heights of the layers in the profile}
 #'  \item{\code{daterange}}{the minimum and maximum nominal time of the
 #'    profiles in the list}
 #'  \item{\code{timesteps}}{time differences between the profiles. Element
@@ -52,6 +52,16 @@
 #'  \item{\code{regular}}{logical indicating whether the time series is
 #'    regular or not}
 #' }
+#' @examples
+#' # load example vertical profile time series:
+#' data(example_vpts)
+#' example_vpts
+#'
+#' # verify this is a vpts object
+#' is.vpts(example_vpts)
+#'
+#' # dimensions of the vpts object
+#' dim(example_vpts)
 summary.vpts <- function(object, ...) {
   print.vpts(object)
 }
@@ -88,9 +98,12 @@ dim.vpts <- function(x) {
 #' @export
 #' @examples
 #' # we start with the example vertical profile time series:
+#' data(example_vpts)
 #' example_vpts
+#'
 #' # extract the 10th profile in the time series (returns a vp object)
 #' example_vpts[10]
+#'
 #' # extract the 20th to 100th profile form the time series (returns a vpts object)
 #' example_vpts[20:100]
 `[.vpts` <- function(x, i) {
@@ -143,6 +156,16 @@ dim.vpts <- function(x) {
 #' @export
 print.vpts <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
   stopifnot(inherits(x, "vpts"))
+  # check if we are dealing with a deprecated vpts class structure
+  if (!is.null(x$heights)) {
+    warning("obsolete vtps object generated with bioRad version < 0.5.0.
+    vpts objects should contain a list element 'height' (instead of obsolete 'heights')")
+  }
+  if (!is.null(x$dates)) {
+    warning("obsolete vtps object generated with bioRad version < 0.4.0.
+    vpts objects should contain a list element 'datetime' (instead of obsolete 'dates')")
+    x$datetime <- x$dates
+  }
   cat(
     "                  ",
     if (x$regular) {
@@ -210,16 +233,20 @@ print.vpts <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
 #' @examples
 #' # load an example vertical profile time series object
 #' data(example_vpts)
-#' 
+#' example_vpts
+#'
 #' # convert the object to a data.frame
 #' df <- as.data.frame(example_vpts)
-#' 
+#'
 #' # do not compute sunrise/sunset information
 #' df <- as.data.frame(example_vpts, suntime = FALSE)
-#' 
+#'
 #' # override the latitude/longitude information stored in the object
 #' # when calculating sunrise / sunset
 #' df <- as.data.frame(example_vpts, suntime = TRUE, lat = 50, lon = 4)
+#'
+#' # print first then rows of data.frame to console:
+#' df[1:10, ]
 as.data.frame.vpts <- function(x, row.names = NULL, optional = FALSE,
                                quantities = names(x$data), suntime = TRUE,
                                geo = TRUE, elev = -0.268, lat = NULL,
@@ -227,12 +254,12 @@ as.data.frame.vpts <- function(x, row.names = NULL, optional = FALSE,
   stopifnot(inherits(x, "vpts"))
   if (!is.null(row.names)) {
     if (is.character(row.names) & length(row.names) ==
-      length(x$datetime) * length(x$heights)) {
+      length(x$datetime) * length(x$height)) {
       rownames(output) <- row.names
     } else {
       stop(paste(
         "'row.names' is not a character vector of length",
-        length(x$datetime) * length(x$heights)
+        length(x$datetime) * length(x$height)
       ))
     }
   }
@@ -257,10 +284,10 @@ as.data.frame.vpts <- function(x, row.names = NULL, optional = FALSE,
   # add height and datetime as a column
   output <- cbind(
     datetime = as.POSIXct(
-      c(t(replicate(length(x$heights), x$datetime))),
+      c(t(replicate(length(x$height), x$datetime))),
       origin = "1970-1-1", tz = "UTC"
     ),
-    height = rep(x$heights, length(x$datetime)), output
+    height = rep(x$height, length(x$datetime)), output
   )
   # add radar name
   output <- cbind(radar = x$radar, output, stringsAsFactors = FALSE)
@@ -276,16 +303,16 @@ as.data.frame.vpts <- function(x, row.names = NULL, optional = FALSE,
   # add day
   if (suntime) {
     dayQ <- !check_night(x, elev = elev)
-    dayQ <- c(t(replicate(length(x$heights), dayQ)))
+    dayQ <- c(t(replicate(length(x$height), dayQ)))
     output <- cbind(output, day = dayQ)
     sunrise <- sunrise(x$datetime, lat = lat, lon = lon)
     sunset <- sunset(x$datetime, lat = lat, lon = lon)
     output$sunrise <- as.POSIXct(
-      c(t(replicate(length(x$heights), sunrise))),
+      c(t(replicate(length(x$height), sunrise))),
       origin = "1970-1-1", tz = "UTC"
     )
     output$sunset <- as.POSIXct(
-      c(t(replicate(length(x$heights), sunset))),
+      c(t(replicate(length(x$height), sunset))),
       origin = "1970-1-1", tz = "UTC"
     )
   }
@@ -309,7 +336,7 @@ vpts_to_vp <- function(x, i) {
   ))
   names(vpout$data) <- names(x$data)
   vpout$attributes <- x$attributes
-  vpout$data$HGHT <- x$heights
+  vpout$data$height <- x$height
   class(vpout) <- "vp"
   vpout
 }
