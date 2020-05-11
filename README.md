@@ -3,9 +3,12 @@
 
 # bioRad <img src="man/figures/logo.png" align="right" alt="" width="120">
 
+<!-- badges: start -->
+
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bioRad)](https://cran.r-project.org/package=bioRad)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3370004.svg)](https://doi.org/10.5281/zenodo.3370004)
+<!-- badges: end -->
 
 bioRad provides standardized methods for extracting and reporting
 biological signals from weather radars. It includes functionality to
@@ -16,7 +19,7 @@ calculate further summary statistics.
 
 To get started, see:
 
-  - [Dokter et al. (2019)](https://doi.org/10.1111/ecog.04028): a paper
+  - [Dokter et al. (2019)](https://doi.org/10.1111/ecog.04028): a paper
     describing the package.
   - [bioRad
     vignette](https://adokter.github.io/bioRad/articles/bioRad.html): an
@@ -49,7 +52,20 @@ with:
 setRepositories(ind = 1:2)
 ```
 
-You can install the released version of bioRad from
+<details>
+
+<summary>Required system libraries on Linux (Ubuntu)</summary>
+
+The following system libraries are required before installing bioRad on
+Linux systems. In terminal, install these with:
+
+    sudo apt install libcurl4-openssl-dev
+    sudo apt install libssl-dev
+    sudo apt install libgdal-dev
+
+</details>
+
+<br> You can install the released version of bioRad from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
@@ -60,6 +76,7 @@ Alternatively, you can install the latest development version from
 [GitHub](https://github.com/adokter/bioRad) with:
 
 ``` r
+# install.packages("devtools")
 devtools::install_github("adokter/bioRad")
 ```
 
@@ -67,18 +84,9 @@ Then load the package with:
 
 ``` r
 library(bioRad)
-#> Welcome to bioRad version 0.5.1
-#> Docker daemon running, Docker functionality enabled (vol2bird version 0.5.1, MistNet available)
+#> Welcome to bioRad version 0.5.2
+#> Docker daemon running, Docker functionality enabled (vol2bird version 0.5.0, MistNet available)
 ```
-
-#### Required system libraries on Linux (Ubuntu)
-
-The following system libraries are required before installing bioRad on
-Linux systems. In terminal, install these with:
-
-    sudo apt install libcurl4-openssl-dev
-    sudo apt install libssl-dev
-    sudo apt install libgdal-dev
 
 ### Docker (optional)
 
@@ -100,7 +108,9 @@ vol2bird](https://github.com/adokter/vol2bird) algorithm through
 [Docker](https://www.docker.com/) to do the above. All other bioRad
 functions will work without a Docker installation.
 
-#### Installing Docker
+<details>
+
+<summary>Installing Docker</summary>
 
 1.  Go to [Docker
     Desktop](https://www.docker.com/products/docker-desktop).
@@ -120,7 +130,11 @@ functions will work without a Docker installation.
 5.  In R do `check_docker()`.
 6.  You can now use the bioRad functionality that requires Docker.
 
-#### Known issues with Docker
+</details>
+
+<details>
+
+<summary>Known issues with Docker</summary>
 
 1.  Hyper-V / Virtualbox conflicts on Windows. Docker requires Hyper-V
     enabled, but Hyper-V can not run together with Virtualbox. To use
@@ -134,6 +148,8 @@ functions will work without a Docker installation.
     [this](https://techoverflow.net/2018/12/15/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/)
     solution. Running `sudo usermod -a -G docker $USER` in a terminal
     will fix this problem.
+
+</details>
 
 ## Usage
 
@@ -219,11 +235,12 @@ tutorial](https://adokter.github.io/bioRad/articles/rad_aero_19.html).
 
 ## Meta
 
-  - We welcome [contributions](https://adokter.github.io/bioRad/CONTRIBUTING.html) including bug
-    reports.
+  - We welcome
+    [contributions](https://adokter.github.io/bioRad/CONTRIBUTING.html)
+    including bug reports.
   - License: MIT
   - Get citation information for `bioRad` in R doing
     `citation("bioRad")`.
   - Please note that this project is released with a [Contributor Code
-    of Conduct](https://adokter.github.io/bioRad/CODE_OF_CONDUCT.html). By participating in this
-    project you agree to abide by its terms.
+    of Conduct](https://adokter.github.io/bioRad/CODE_OF_CONDUCT.html).
+    By participating in this project you agree to abide by its terms.

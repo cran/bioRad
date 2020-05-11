@@ -10,7 +10,7 @@
 #' @param radar_size Size of the symbol indicating the radar position.
 #' @param radar_color Color of the symbol indicating the radar position.
 #' @param n_color The number of colors (>=1) to be in the palette.
-#' @param palette (Optional) character vector of hexidecimal color values defining
+#' @param palette (Optional) character vector of hexadecimal color values defining
 #' the plot color scale, e.g. output from \link[viridisLite]{viridis}
 #' @param xlim Range of x values to plot (degrees longitude), as atomic
 #' vector of length 2.
@@ -31,15 +31,15 @@
 #' Available scan parameters for mapping can by printed to screen by
 #' \code{summary(x)}. Commonly available parameters are:
 #' \describe{
-#'  \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor [dBZ]}
-#'  \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor [dBZ]}
-#'  \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity [m/s]. Radial
+#'  \item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor (dBZ)}
+#'  \item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor (dBZ)}
+#'  \item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity (m/s). Radial
 #'  velocities towards the radar are negative, while radial velocities away
 #'  from the radar are positive}
-#'  \item{"\code{RHOHV}"}{Correlation coefficient [unitless]. Correlation
+#'  \item{"\code{RHOHV}"}{Correlation coefficient (unitless) Correlation
 #'  between vertically polarized and horizontally polarized reflectivity factor}
-#'  \item{"\code{PHIDP}"}{Differential phase [degrees]}
-#'  \item{"\code{ZDR}"}{(Logged) differential reflectivity [dB]}
+#'  \item{"\code{PHIDP}"}{Differential phase (degrees)}
+#'  \item{"\code{ZDR}"}{(Logged) differential reflectivity (dB)}
 #' }
 #' The scan parameters are named according to the OPERA data information
 #' model (ODIM), see Table 16 in the

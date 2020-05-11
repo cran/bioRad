@@ -16,12 +16,12 @@ Extract, visualize and summarize aerial movements of birds and
 To get started, see:
 
 \itemize{
-  \item \href{https://doi.org/10.1111/ecog.04028}{Dokter et al. (2019)}: a
-  paper describing the package.
-  \item \href{https://adokter.github.io/bioRad/articles/bioRad.html}{bioRad
-  vignette}: an introduction to bioRad's main functionalities.
-  \item \href{https://adokter.github.io/bioRad/reference/index.html}{Function
-  reference}: an overview of all bioRad functions.
+\item \href{https://doi.org/10.1111/ecog.04028}{Dokter et al. (2019)}: a
+paper describing the package.
+\item \href{https://adokter.github.io/bioRad/articles/bioRad.html}{bioRad
+vignette}: an introduction to bioRad's main functionalities.
+\item \href{https://adokter.github.io/bioRad/reference/index.html}{Function
+reference}: an overview of all bioRad functions.
 }
 }
 \seealso{
@@ -45,6 +45,7 @@ Authors:
 Other contributors:
 \itemize{
   \item Bart Kranstauber \email{b.kranstauber@uva.nl} (\href{https://orcid.org/0000-0001-8303-780X}{ORCID}) [contributor]
+  \item Cecilia Nilsson \email{cecilia.nilsson709@gmail.com} (\href{https://orcid.org/0000-0001-8957-4411}{ORCID}) [contributor]
   \item Jurriaan Spaaks \email{j.spaaks@esciencecenter.nl} [contributor]
   \item Lourens Veen \email{l.veen@esciencecenter.nl} [contributor]
   \item Liesbeth Verlinden \email{l.verlinden@uva.nl} (\href{https://orcid.org/0000-0003-1744-9325}{ORCID}) [contributor]

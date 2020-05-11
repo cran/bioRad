@@ -204,6 +204,11 @@ plot.vpts <- function(x, xlab = "time", ylab = "height [m]", quantity = "dens",
     zlim[1] - (zlim[2] - zlim[1]) / 1000,
     seq(zlim[1], zlim[2], length.out = 256)
   )
+
+  # if a regular time series, use the regular timegrid for plotting
+  # (in case keep_datetime = TRUE option is used in regularize_vpts())
+  if(x$regular) x$datetime <- seq(from = x$daterange[1], to = x$daterange[2], by = x$timesteps[1])
+
   # move points out of zlim range into valid color range
   plotdata[plotdata < (breaks[2] + breaks[3]) / 2] <- (breaks[2] + breaks[3]) / 2
   plotdata[plotdata > zlim[2]] <- breaks[length(breaks)]
@@ -311,7 +316,7 @@ plot_wind_barbs <- function(cx, cy, direction = 0, speed = NA,
       }
       if (fill[i] > 0) {
         lim <- c(51, 101, 151, 200)
-        polygon(c(x, X1[1:lim[fill[i]]]), c(y, Y1[1:lim[fill[i]]]),
+        polygon(c(as.numeric(x), X1[1:lim[fill[i]]]), c(y, Y1[1:lim[fill[i]]]),
           density = -1, col = col
         )
       }
@@ -403,8 +408,8 @@ plot_wind_barbs <- function(cx, cy, direction = 0, speed = NA,
         S2 <- rbind(X2, Y2)
         S1 <- rot %*% S1
         S2 <- rot %*% S2
-        S1 <- S1 * c(scalex, scaley) + c(x, y)
-        S2 <- S2 * c(scalex, scaley) + c(x, y)
+        S1 <- S1 * c(scalex, scaley) + c(as.numeric(x), y)
+        S2 <- S2 * c(scalex, scaley) + c(as.numeric(x), y)
       }
       if (spd > 0) {
         segments(S1[1, ], S1[2, ], S2[1, ], S2[2, ], col = col, lwd = 1)

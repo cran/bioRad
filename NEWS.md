@@ -1,12 +1,45 @@
+# bioRad 0.5.2
+
+This release is primarily a hotfix for R version 4.0 (#375). All issues included in this release can be found [here](https://github.com/adokter/bioRad/pull/388). New features and improvements include:
+
+* `regularize_vpts()` is now much faster, and chooses more intuitive starting and ending point of the regularized grid, e.g. projecting on half hour grid will have time series start on the nearest half hour (#332)
+
+* new option `keep_timestamp` in `regularize_vpts()`, which allows individual profiles to keep there original timestamp instead of the timestamp of the regularized grid.
+
+* improved documentation of sunrise/sunset functions (#180) and new option `force_tz` ([4968019](https://github.com/adokter/bioRad/commit/4968019)).
+
+* new option `offset` in `check_night()`, which allows day/night transition to be shifted by a temporal offset (#338). For example, this is useful when selecting night time profiles that start a specific number of hours after sunset.
+
+* selection for day and night in vpts in `filter_vpts()` using new arguments `night`, `elev` and `offset`, based on functionality of `check_night()` (#345)
+
+* `check_night()` method for vpi objects ([23def64](https://github.com/adokter/bioRad/commit/23def64))
+
+* new functions `noy()` and `doy()` to determine which night or day of the year a profile belongs to (#346).
+
+* parameter `quantities` has been deprecated in `as.data.frame.vpts()` (#364)
+
+* changes in `dim()` for pvol and vpts objects (#355)
+
+* bugfixes (#330, #368, #352) and documentation improvements
+
 # bioRad 0.5.1
 
-Minor bugfixes. All issues included in this release can be found [here](https://github.com/adokter/bioRad/pull/334)
+Minor bugfixes. All issues included in this release can be found [here](https://github.com/adokter/bioRad/pull/334). This release primarily fixes a bug that will become effective once R version 4.0 is released.
 
-* extend the functionality of composite_ppi() and improve its documentation (partial fix of #59)
+* fixes a conflict due to new raw data format introduced in R version 4.0 (#331)
 
-* fix a bug in the color legend of map() when providing a custom color scale with palette argument (#324)
+* corrects incorrect values in reading of correlation coefficient values RHOHV (#328)
 
-* resolve a conflict with upcoming R 0.4 release
+* bugfix in `read_cajun()` which introduced incorrect height column during refactoring in bioRad 0.5.0 release ([93ad0a4](https://github.com/adokter/bioRad/commit/93ad0a4))
+
+* bugfix that fixes the mapping by `map()` of composites of composites (ppi's produced after repeated application of `composite_ppi()`) ([a5c9048](https://github.com/adokter/bioRad/commit/a5c9048), [043aa73](https://github.com/adokter/bioRad/commit/043aa73))
+* minor bug fixes, and addressing conflicts with CRAN dependencies
+
+* extend the functionality of `composite_ppi()` and improve its documentation (partial fix of #59)
+
+* fix a bug in the color legend of `map()` when providing a custom color scale with palette argument (#324)
+
+* minor documentation improvements
 
 # bioRad 0.5.0
 
@@ -14,7 +47,7 @@ New CRAN release. All issues included in this release can be found [here](https:
 
 ## New features
 
-* `integrate_to_ppi()` is a new function to estimate spatial images of vertically integrated density and reflectivity. This function produces an `ppi` image showing the density of animals on the earth's surface, corrected for the changing overlap between the radar beams and animal layer with distance from the radar. See [Kranstauber et al. 2020](https://www.mdpi.com/2072-4292/12/4/635) for methodology and [this vignette](https://adokter.github.io/bioRad/articles/range_correction.html) for examples.
+* `integrate_to_ppi()` is a new function to estimate spatial images of vertically integrated density and reflectivity. This function produces an `ppi` image showing the density of animals on the earth's surface, corrected for the changing overlap between the radar beams and animal layer with distance from the radar. See [Kranstauber et al. 2020](https://doi.org/10.3390/rs12040635) for methodology and [this vignette](https://adokter.github.io/bioRad/articles/range_correction.html) for examples.
 
 * `apply_mistnet()` is a new function to apply the convolution neural network "MistNet" on pvolfiles to separate biological and meteorological signals (see [Lin et al. 2019](https://doi.org/10.1111/2041-210X.13280)). Results can be readily visualized with `plot.ppi()` and `plot.scan()`. MistNet is now also a segmentation option in `calculate_vp()` (#262).
 
