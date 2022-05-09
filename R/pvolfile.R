@@ -1,115 +1,118 @@
-#' Check if a local file is a polar volume (\code{pvol})
+#' Check if a file is a polar volume (`pvol`)
 #'
-#' Check whether a file is a polar volume in ODIM HDF5 format that can be read with
-#' package \pkg{bioRad}
+#' Checks whether a file is a polar volume (`pvol`) in the ODIM HDF5 format that
+#' can be read with bioRad. Evaluates to `FALSE` for NEXRAD and IRIS RAW polar
+#' volume file (see [nexrad_to_odim()]).
 #'
-#' @param file A string containing a file name.
-#' @param filename Deprecated argument, use file instead.
+#' @param file Character. Path of the file to check.
 #'
-#' @return TRUE when \code{file} is a polar volume in readable format,
-#' otherwise FALSE
+#' @return `TRUE` for a polar volume file in readable format, otherwise `FALSE`.
 #'
 #' @export
-#' @details
-#' The function checks whether a HDF5 file provided as input is a polar volume
-#' in ODIM HDF5 format. The function currently evaluates to FALSE for NEXRAD and
-#' IRIS RAW polar volume files.
+#'
+#' @seealso
+#' * [read_pvolfile()]
+#' * [get_odim_object_type()]
+#' * [is.pvol()]
 #'
 #' @examples
-#' # locate example file:
+#' # Locate the polar volume example file
 #' pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
 #'
-#' # check that the file is an ODIM HDF5 polar volume:
-#' is.pvolfile(pvolfile) # > TRUE
-is.pvolfile <- function(file, filename = NULL) {
-
-  # deprecate function arguments
-  if (!missing(filename)) {
-    warning("argument filename is deprecated; please use file instead.",
-      call. = FALSE
-    )
-    file <- filename
-  }
-
+#' # Check if it is a pvolfile
+#' is.pvolfile(pvolfile)
+is.pvolfile <- function(file) {
   type <- get_odim_object_type(file)
   if (is.na(type)) {
+    warning(paste("is.pvolfile() must be a hdf5 file. Polar volume files in ",
+                  "other data formats not yet recognized)."))
     return(FALSE)
   } else {
     return(type == "PVOL")
   }
 }
 
-#' Check the data object contained in a ODIM HDF5 file
+#' Check the `data` object contained in a ODIM HDF5 file
 #'
-#' Checks which data object is contained in ODIM HDF5 file
+#' Checks which data class is contained in a ODIM HDF5 file. See [ODIM
+#' specification](https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf),
+#' Table 2 for a full list of existing ODIM file object types.
 #'
-#' @param file A string containing a file name.
+#' @param file Character. Path of the file to check.
 #'
-#' @return character string \code{PVOL} for polar volume, \code{VP} for
-#' vertical profile. 
+#' @return Character. `PVOL` for polar volume, `VP` for vertical profile,
+#'   otherwise `NA`.
 #'
 #' @export
-#' 
-#' @details
-#' See \href{https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf}{ODIM specification}
-#' Table 2 for a full list of existing ODIM file object types. 
-#' 
+#'
+#' @seealso
+#' * [is.pvolfile()]
+#' * [is.vpfile()]
+#'
 #' @examples
-#' # locate a polar volume file:
+#' # Locate the polar volume example file
 #' pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
 #'
-#' # check the data type:
-#' get_odim_object_type(pvolfile) # > "PVOL"
+#' # Check the data type
+#' get_odim_object_type(pvolfile)
 get_odim_object_type <- function(file) {
   if (!file.exists(file)) {
-    warning(paste(file, "does not exist"))
+    warning(glue("Can't find {file}"))
     return(NA)
   }
   if (!is.odimfile(file)) {
-    warning(paste(file, "is not a ODIM HDF5 file"))
+    # Errors are handled by is.odimfile()
     return(NA)
   }
   object <- h5readAttributes(file, "what")$object
+  # current implementation of write_pvolfile stores string attributes as
+  # single element arrays. This line guarantees that for files written with write_pvolfile
+  # the output class is character instead of an array with a single character element.
+  object <- object[1]
   return(object)
 }
 
 is.odimfile <- function(file) {
   if (!H5Fis_hdf5(file)) {
-    warning(paste(file, "is not a HDF5 file"))
+    warning(glue("{file} is not an HDF5 file."))
     return(FALSE)
   }
   output <- TRUE
   groups <- h5ls(file, recursive = FALSE)$name
   if (!("dataset1" %in% groups)) {
     output <- FALSE
-    warning(paste(
-      "HDF5 file", file,
-      "does not contain a /dataset1 group"
-    ))
+    warning(
+      glue("HDF5 file {file} does not contain a `/dataset1` group.")
+    )
   }
 
   if (!("what" %in% groups)) {
     output <- FALSE
-    warning(paste(
-      "HDF5 file", file,
-      "does not contain a /what group"
-    ))
+    warning(
+      glue("HDF5 file {file} does not contain a `/what` group.")
+    )
   } else {
     object <- h5readAttributes(file, "what")$object
-
     if (is.null(object)) {
-      warning("'object' attribute not found in /what group")
+      warning(
+        glue("HDF5 file {file} does not contain an `object` attribute in the ",
+        "`/what` group.")
+      )
       output <- FALSE
     }
   }
 
   if (!("how" %in% groups)) {
     # accepting a missing /how group
-    warning(paste("HDF5 file", file, "does not contain a /how group"))
+    warning(
+      glue("HDF5 file {file} does not contain a `/how` group.")
+    )
   }
   if (!("where" %in% groups)) {
     output <- FALSE
-    warning(paste("HDF5 file", file, "does not contain a /where group"))
+    warning(
+      glue("HDF5 file {file} does not contain a `/where` group.")
+    )
   }
   return(output)
 }

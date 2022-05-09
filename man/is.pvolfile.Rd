@@ -2,32 +2,32 @@
 % Please edit documentation in R/pvolfile.R
 \name{is.pvolfile}
 \alias{is.pvolfile}
-\title{Check if a local file is a polar volume (\code{pvol})}
+\title{Check if a file is a polar volume (\code{pvol})}
 \usage{
-is.pvolfile(file, filename = NULL)
+is.pvolfile(file)
 }
 \arguments{
-\item{file}{A string containing a file name.}
-
-\item{filename}{Deprecated argument, use file instead.}
+\item{file}{Character. Path of the file to check.}
 }
 \value{
-TRUE when \code{file} is a polar volume in readable format,
-otherwise FALSE
+\code{TRUE} for a polar volume file in readable format, otherwise \code{FALSE}.
 }
 \description{
-Check whether a file is a polar volume in ODIM HDF5 format that can be read with
-package \pkg{bioRad}
-}
-\details{
-The function checks whether a HDF5 file provided as input is a polar volume
-in ODIM HDF5 format. The function currently evaluates to FALSE for NEXRAD and
-IRIS RAW polar volume files.
+Checks whether a file is a polar volume (\code{pvol}) in the ODIM HDF5 format that
+can be read with bioRad. Evaluates to \code{FALSE} for NEXRAD and IRIS RAW polar
+volume file (see \code{\link[=nexrad_to_odim]{nexrad_to_odim()}}).
 }
 \examples{
-# locate example file:
+# Locate the polar volume example file
 pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
 
-# check that the file is an ODIM HDF5 polar volume:
-is.pvolfile(pvolfile) # > TRUE
+# Check if it is a pvolfile
+is.pvolfile(pvolfile)
+}
+\seealso{
+\itemize{
+\item \code{\link[=read_pvolfile]{read_pvolfile()}}
+\item \code{\link[=get_odim_object_type]{get_odim_object_type()}}
+\item \code{\link[=is.pvol]{is.pvol()}}
+}
 }

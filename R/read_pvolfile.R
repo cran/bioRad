@@ -20,6 +20,8 @@
 #' to console.
 #' @param mount A character string with the mount point (a directory path)
 #' for the Docker container.
+#' @param local_install (optional) String with path to local vol2bird installation,
+#' to use local installation instead of Docker container
 #'
 #' @return An object of class \link[=summary.pvol]{pvol}, which is a list
 #' containing polar scans, i.e. objects of class \code{scan}
@@ -71,11 +73,14 @@ read_pvolfile <- function(file, param = c(
                           ),
                           sort = TRUE, lat, lon, height, elev_min = 0,
                           elev_max = 90, verbose = TRUE,
-                          mount = dirname(file)) {
+                          mount = dirname(file), local_install) {
+  if(!file.exists(file)){
+     stop(paste0("'",file,"' does not exist in current working directory ('",getwd(),"')."))
+  }
   tryCatch(read_pvolfile_body(
     file, param, sort, lat, lon,
     height, elev_min, elev_max,
-    verbose, mount
+    verbose, mount, local_install
   ),
   error = function(err) {
     rhdf5::h5closeAll()
@@ -92,7 +97,7 @@ read_pvolfile_body <- function(file, param = c(
                                ),
                                sort = TRUE, lat, lon, height, elev_min = 0,
                                elev_max = 90, verbose = TRUE,
-                               mount = dirname(file)) {
+                               mount = dirname(file), local_install) {
   # input checks
   if (!is.logical(sort)) {
     stop("'sort' should be logical")
@@ -120,10 +125,10 @@ read_pvolfile_body <- function(file, param = c(
       stop("Failed to read HDF5 file.")
     }
   } else {
-    if (verbose) {
+    if (verbose && missing(local_install)) {
       cat("Converting using Docker...\n")
     }
-    if (!.pkgenv$docker) {
+    if (!.pkgenv$docker && missing(local_install)) {
       stop(
         "Requires a running Docker daemon.\nTo enable, start your ",
         "local Docker daemon, and run 'check_docker()' in R\n"
@@ -131,7 +136,7 @@ read_pvolfile_body <- function(file, param = c(
     }
     file <- nexrad_to_odim_tempfile(file,
       verbose = verbose,
-      mount = mount
+      mount = mount, local_install
     )
     if (!is.pvolfile(file)) {
       file.remove(file)
@@ -223,11 +228,17 @@ read_pvolfile_body <- function(file, param = c(
   attribs.where$lat <- vol.lat
   attribs.where$lon <- vol.lon
 
+  # assemble attributes in list
+  attributes <- list(
+    how = attribs.how, what = attribs.what,
+    where = attribs.where
+  )
+
   # read scan groups
   data <- lapply(
     scans,
     function(x) {
-      read_pvolfile_scan(file, x, param, radar, datetime, geo)
+      read_pvolfile_scan(file, x, param, radar, datetime, geo, attributes)
     }
   )
 
@@ -247,10 +258,7 @@ read_pvolfile_body <- function(file, param = c(
   # prepare output
   output <- list(
     radar = radar, datetime = datetime, scans = data,
-    attributes = list(
-      how = attribs.how, what = attribs.what,
-      where = attribs.where
-    ), geo = geo
+    attributes = attributes, geo = geo
   )
   class(output) <- "pvol"
   if (cleanup) {
@@ -259,10 +267,13 @@ read_pvolfile_body <- function(file, param = c(
   output
 }
 
-read_pvolfile_scan <- function(file, scan, param, radar, datetime, geo) {
-  h5struct <- h5ls(file)
+read_pvolfile_scan <- function(file, scan, param, radar, datetime, geo, attributes) {
+  h5struct <- h5ls(file, all = TRUE)
+  groups <- h5struct[h5struct$group == paste("/", scan, sep = ""), ]$name
+  groups <- groups[grep("data", groups)]
+  dtypes <- h5struct[startsWith(h5struct$group, paste("/", scan, "/data", sep = "")), ]
+  dtypes <- dtypes[dtypes$name == "data", ]$dtype
   h5struct <- h5struct[h5struct$group == paste("/", scan, sep = ""), ]$name
-  groups <- h5struct[grep("data", h5struct)]
 
   # select which scan parameters to read
   if (length(param) == 1 && param == "all") {
@@ -284,6 +295,7 @@ read_pvolfile_scan <- function(file, scan, param, radar, datetime, geo) {
       }
     )
     groups <- groups[quantityNames %in% param]
+    dtypes <- dtypes[quantityNames %in% param]
     if (length(groups) == 0) {
       return(NULL)
     }
@@ -305,21 +317,30 @@ read_pvolfile_scan <- function(file, scan, param, radar, datetime, geo) {
   geo$elangle <- c(attribs.where$elangle)
   geo$rscale <- c(attribs.where$rscale)
   geo$ascale <- c(360 / attribs.where$nrays)
+  geo$astart <- attribs.how$astart
+  # odim stores ranges as Km in package ranges are until now in meters
+  geo$rstart <- attribs.where$rstart * 1000
+
 
   # read scan parameters
-  quantities <- lapply(
-    groups,
-    function(x) {
+  quantities <- mapply(
+    function(x, y) {
       read_pvolfile_quantity(
         file,
         paste(scan, "/", x, sep = ""),
-        radar, datetime, geo
+        radar, datetime, geo, y
       )
-    }
+    },
+    x = groups,
+    y = dtypes,
+    SIMPLIFY = FALSE
   )
   quantityNames <- sapply(quantities, "[[", "quantityName")
   quantities <- lapply(quantities, "[[", "quantity")
   names(quantities) <- quantityNames
+
+  # if wavelength is attribute is missing at the scan level, copy it from the pvol level
+  if(is.null(attribs.how$wavelength)) attribs.how$wavelength = attributes$how$wavelength
 
   output <- list(
     radar = radar, datetime = datetime, params = quantities,
@@ -332,7 +353,7 @@ read_pvolfile_scan <- function(file, scan, param, radar, datetime, geo) {
   output
 }
 
-read_pvolfile_quantity <- function(file, quantity, radar, datetime, geo) {
+read_pvolfile_quantity <- function(file, quantity, radar, datetime, geo, dtype) {
   data <- h5read(file, quantity)$data
   # convert storage mode from raw to numeric:
   storage.mode(data) <- "numeric"
@@ -343,10 +364,14 @@ read_pvolfile_quantity <- function(file, quantity, radar, datetime, geo) {
   if(attr$quantity == "RHOHV"){
     data <- replace(data, data > 10, NaN)
   }
+  conversion <- list(gain = as.numeric(attr$gain), offset = as.numeric(attr$offset),
+                     nodata = as.numeric(attr$nodata), undetect = as.numeric(attr$undetect),
+                     dtype = dtype)
   class(data) <- c("param", class(data))
   attributes(data)$radar <- radar
   attributes(data)$datetime <- datetime
   attributes(data)$geo <- geo
-  attributes(data)$param <- attr$quantity
+  attributes(data)$param <- as.character(attr$quantity)
+  attributes(data)$conversion <- conversion
   list(quantityName = attr$quantity, quantity = data)
 }

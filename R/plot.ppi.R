@@ -1,6 +1,6 @@
 #' Plot a plan position indicator (\code{ppi})
 #'
-#' Plot a plan position indicator (PPI) generated with \link{ppi}
+#' Plot a plan position indicator (PPI) generated with \code{project_to_ppi}
 #' using \link[ggplot2]{ggplot}
 #'
 #' @param x An object of class \code{ppi}.
@@ -44,11 +44,11 @@
 #' # make ppi for the scan
 #' ppi <- project_as_ppi(example_scan)
 #'
-#' # plot the first scan parameter, which in this case is "VRADH":
+#' # plot the default scan parameter, which is reflectivity "DBZH":
 #' plot(ppi)
 #'
-#' # plot the reflectivity parameter:
-#' plot(ppi, param = "DBZH")
+#' # plot the radial velocity parameter:
+#' plot(ppi, param = "VRADH")
 #'
 #' # change the range of reflectivities to plot, from -10 to 10 dBZ:
 #' plot(ppi, param = "DBZH", zlim = c(-10, 10))
@@ -76,7 +76,7 @@ plot.ppi <- function(x, param, xlim, ylim, zlim = c(-20, 20),
   }
   colorscale <- color_scale_fill(param, zlim, na.value)
   # extract the scan parameter
-  y <- NULL # dummy asignment to suppress devtools check warning
+  y <- NULL # dummy assignment to suppress devtools check warning
   data <- do.call(function(y) x$data[y], list(param))
   # convert to points
   data <- raster::as.data.frame(raster(data), xy = T)

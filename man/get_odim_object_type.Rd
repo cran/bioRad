@@ -2,28 +2,31 @@
 % Please edit documentation in R/pvolfile.R
 \name{get_odim_object_type}
 \alias{get_odim_object_type}
-\title{Check the data object contained in a ODIM HDF5 file}
+\title{Check the \code{data} object contained in a ODIM HDF5 file}
 \usage{
 get_odim_object_type(file)
 }
 \arguments{
-\item{file}{A string containing a file name.}
+\item{file}{Character. Path of the file to check.}
 }
 \value{
-character string \code{PVOL} for polar volume, \code{VP} for
-vertical profile.
+Character. \code{PVOL} for polar volume, \code{VP} for vertical profile,
+otherwise \code{NA}.
 }
 \description{
-Checks which data object is contained in ODIM HDF5 file
-}
-\details{
-See \href{https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf}{ODIM specification}
+Checks which data class is contained in a ODIM HDF5 file. See \href{https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf}{ODIM specification},
 Table 2 for a full list of existing ODIM file object types.
 }
 \examples{
-# locate a polar volume file:
+# Locate the polar volume example file
 pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
 
-# check the data type:
-get_odim_object_type(pvolfile) # > "PVOL"
+# Check the data type
+get_odim_object_type(pvolfile)
+}
+\seealso{
+\itemize{
+\item \code{\link[=is.pvolfile]{is.pvolfile()}}
+\item \code{\link[=is.vpfile]{is.vpfile()}}
+}
 }

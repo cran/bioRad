@@ -27,7 +27,7 @@ For \code{\link[=dim.vpts]{dim.vpts()}}: number of datetimes, heights and quanti
 time series of vertical profiles (\code{vpts}).
 }
 \description{
-R base functions for inspecting a time series of vertical profiles (\code{vp})
+R base functions for inspecting a time series of vertical profiles (\code{vpts})
 object.
 }
 \details{
@@ -39,32 +39,43 @@ be projected onto a regular time grid with \code{\link[=regularize_vpts]{regular
 of vertical profile (\code{vp}) object is a list containing:
 \itemize{
 \item \code{radar}: Radar identifier.
-\item \code{datetime}: Nominal times of the profiles (named \code{dates} in biorad <
+\item \code{datetime}: Nominal times of the profiles (named \code{dates} in bioRad <
 0.4.0) in UTC.
-\item \code{height}: Lowest height of the height bins in the profiles in m above sea level.
+\item \code{height}: Lowest height of the height bins in the profiles in m above sea
+level.
 \item \code{daterange}: Minimum and maximum nominal time of the profiles in UTC.
 \item \code{timesteps}: Time differences between the profiles. Element \code{i} gives the
 difference between profile \code{i} and \code{i+1}.
 \item \code{data}: A list of quantities, each containing a \code{datetime} by \code{height}
 matrix with the values. Use \code{\link[=get_quantity]{get_quantity()}} to access these and see
 \code{\link[=summary.vp]{summary.vp()}} for a description of available quantities.
-\item \code{attributes}: List of the vertical profile's \code{what}, \code{where}, and \code{how} attributes,
-copied from the first profile.
+\item \code{attributes}: List of the vertical profile's \code{what}, \code{where}, and \code{how}
+attributes, copied from the first profile.
 \item \code{regular}: Logical indicating whether the time series is regular or not.
 }
 }
-\examples{
-# Load the example time series of vertical profiles
-vpts <- example_vpts
+\section{Conventions}{
 
-# Verify that it is an object of class vpts
-is.vpts(vpts)
+\itemize{
+\item \code{NA}: Maps to \code{nodata} in the ODIM convention: value to denote areas void
+of data (never radiated).
+\item \code{NaN}: Maps to \code{undetect} in the ODIM convention: denote areas below the
+measurement detection threshold (radiated but nothing detected). The value is
+also used when there are too few datapoints to calculate a quantity.
+\item \code{0}: Maps to \code{0} in the ODIM convention: denote areas where the quantity
+has a measured value of zero (radiated and value zero detected or inferred).
+}
+}
+
+\examples{
+# Check if an object is of class vpts
+is.vpts(example_vpts)
 
 # Get summary info
-vpts # Same as summary(vpts) or print(vpts)
+example_vpts # Same as summary(example_vpts) or print(example_vpts)
 
 # Get dimensions
-dim(vpts)
+dim(example_vpts)
 }
 \seealso{
 \itemize{

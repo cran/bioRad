@@ -30,10 +30,10 @@ call to \link[bioRad]{integrate_profile}.}
 '\code{rtr}' (reflectivity traffic rate),
 '\code{mt}' ((cumulative) migration traffic),
 '\code{rt}' ((cumulative) reflectivity traffic),
-'\code{ff}' (height-averaged speed)
+'\code{ff}' (height-averaged ground speed)
 '\code{dd}' (height-averaged direction)
-'\code{u}' (height-averaged u-component of speed),
-'\code{v}' (height-averaged v-component of speed).}
+'\code{u}' (height-averaged u-component of ground speed),
+'\code{v}' (height-averaged v-component of ground speed).}
 
 \item{xlab}{A title for the x-axis.}
 
@@ -82,10 +82,10 @@ on the assumed radar cross section (RCS)}
 \item{\code{ff}}{Horizontal ground speed in m/s}
 \item{\code{dd}}{Horizontal ground speed direction in degrees}
 \item{\code{u}}{Ground speed component west to east in m/s}
-\item{\code{v}}{Ground speed component north to south in m/s}
+\item{\code{v}}{Ground speed component south to north in m/s}
 \item{\code{height}}{Mean flight height (height weighted by reflectivity eta) in m above sea level}
 }
-The height-averaged speed quantities (ff,dd,u,v) and height are weighted averages by reflectivity eta.
+The height-averaged ground speed quantities (ff,dd,u,v) and height are weighted averages by reflectivity eta.
 }
 \examples{
 # vertically integrate a vpts object:

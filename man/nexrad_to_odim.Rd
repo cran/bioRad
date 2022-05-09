@@ -8,7 +8,8 @@ nexrad_to_odim(
   pvolfile_nexrad,
   pvolfile_odim,
   verbose = FALSE,
-  mount = dirname(pvolfile_nexrad)
+  mount = dirname(pvolfile_nexrad),
+  local_install
 )
 }
 \arguments{
@@ -17,11 +18,14 @@ nexrad_to_odim(
 \item{pvolfile_odim}{Filename for the polar volume in ODIM HDF5 format to be
 generated.}
 
-\item{verbose}{logical. When TRUE, pipe Docker stdout to R console. On
-Windows always TRUE.}
+\item{verbose}{Logical. When \code{TRUE}, Docker \code{stdout} is piped to the R
+console. Always \code{TRUE} on Windows.}
 
-\item{mount}{character. String with the mount point (a directory path) for
-the Docker container.}
+\item{mount}{Character. Directory path of the mount point for the Docker
+container.}
+
+\item{local_install}{Character. Path to local vol2bird installation (e.g.
+\code{your/vol2bird_install_directory/vol2bird/bin/vol2bird.sh}).}
 }
 \value{
 \code{TRUE} on success

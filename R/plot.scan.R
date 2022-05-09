@@ -1,7 +1,7 @@
 #' Plot a scan (\code{scan}) in polar coordinates
 #'
 #' Plots a scan in polar coordinates. For plots in Cartesian coordinates,
-#' see \link{ppi}
+#' see \code{project_to_ppi}
 #'
 #' @param x An object of class \code{scan}.
 #' @param param The scan parameter to plot, see details below.
@@ -76,9 +76,13 @@ plot.scan <- function(x, param, xlim = c(0, 100000),
   class(data) <- "matrix"
   # convert to points
   dimraster <- dim(data)
-  ascale <- c(x$attributes$where$nrays) / 360
-  rscale <- c(x$attributes$where$rscale)
-  data <- raster::as.data.frame(raster::flip(raster(t(data), ymn = 0, ymx = 360, xmn = 0, xmx = rscale * dimraster[1]), direction = "y"), xy = T)
+
+  rscale <- x$geo$rscale
+  ascale <- x$geo$ascale
+  rstart <- ifelse(is.null(x$geo$rstart), 0, x$geo$rstart)
+  astart <- ifelse(is.null(x$geo$astart), 0, x$geo$astart)
+
+  data <- raster::as.data.frame(raster::flip(raster(t(data), ymn = astart, ymx = astart + 360, xmn = rstart, xmx = rstart + rscale * dimraster[1]), direction = "y"), xy = T)
   # change the name from "layer" to the parameter names
   names(data) <- c("range", "azimuth", param)
 
@@ -92,7 +96,7 @@ plot.scan <- function(x, param, xlim = c(0, 100000),
     data[index, 3] <- zlim[2]
   }
   # plot
-  azimuth <- NULL # dummy asignment to suppress devtools check warning
+  azimuth <- NULL # dummy assignment to suppress devtools check warning
   bbox <- coord_cartesian(xlim = xlim, ylim = ylim)
   ggplot(data = data, ...) +
     geom_raster(aes(x = range, y = azimuth, fill = eval(parse(text = param)))) +
