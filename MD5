@@ -1,7 +1,7 @@
-b1b48b24744ea8012ab30b8a1aef798f *DESCRIPTION
+7207ac8a50ac060cfe8582097bab0fa1 *DESCRIPTION
 374de0f67e45d9b04e151ab22e608a98 *LICENSE
 e2dc272639ad67e69be6452617d39c4d *NAMESPACE
-f69a543d7a2fd1a20741226ac6cc8a6e *NEWS.md
+2907c04f8570b4bcc9301198c586fc6e *NEWS.md
 e1a6959502c35c14faded080ca3b0f20 *R/apply_mistnet.R
 c8354a04cd02b9ae59d68296196bbb92 *R/as.data.frame.R
 e58905fc56f9d1ed62afaebf509b897d *R/attribute_table.R
@@ -10,13 +10,13 @@ e0c13b58d13a3e1adaaad618a0e36fc1 *R/bind_into_vpts.R
 3ce36bccf47bfa9369ff4e8d51e86b3c *R/bioRad-deprecated.R
 2f697e8d3dff2dcfb48a4ef19e587bf8 *R/bioRad.R
 0628ac474ac11dd2bfdcd35fb8de0c73 *R/calculate_param.R
-fb383c37d092f4584c1396fc7335f73c *R/calculate_vp.R
+01f9e791ed5088cfaa04c62b0f4f51ea *R/calculate_vp.R
 f3e9a680359b6963461664002a73622f *R/check_night.R
 f5cc4129b653dc4d64cf7ec7ed9073ed *R/color_scale.R
 55386d21a9ff517ddce59690ec2a35ae *R/composite_ppi.R
 ec5670fba8abb53db9a322367431cf31 *R/convert_legacy.R
 81e15086c42154cedcad81f8007e81bd *R/data.R
-2f9d468cf9fe8756060415607d583c05 *R/dbz_eta.R
+54b539993bf9784dd178f8773cd2cacc *R/dbz_eta.R
 a27fad3aef2be39181d5d29df4c7eb01 *R/docker.R
 d75aaad3dd7dc2f713c5216c0c4e8cda *R/download_basemap.R
 b7551f7f2b70b6a6da81c1e35806a281 *R/download_pvolfiles.R
@@ -28,7 +28,7 @@ f1ebd039940d0d8e1aa4f654d5785af0 *R/doy_noy.R
 d8321b1327f9f5cf22d90abd794473ec *R/get_quantity.R
 3962ca371fc42f0ef70329410cb49ce5 *R/get_scan.R
 f570acc3184119eef9d84002fc13c4f1 *R/hooks.R
-63aced17c3223986c61d86601828e216 *R/integrate_profile.R
+67be4456f06d240b8702fc66a586c3a9 *R/integrate_profile.R
 15ec641461908e8b643fde326544e114 *R/integrate_to_ppi.R
 2c2df3f73ed6334ee25c1b8e1c72cb3b *R/iris.R
 628d21d42bbb20eca534c47876142e35 *R/map.R
@@ -46,7 +46,7 @@ a884911dca4808fce5c614ebc6d5db58 *R/ppi.R
 7e6df0b8a898b8e1c16d8be284aa61b8 *R/pvol.R
 2498474fbca1fafd04f7ea82cb26b638 *R/pvolfile.R
 77c04e43c813a3aa3c8895786867775a *R/rcs.R
-ac11c8d2822898dc6a856d0f3d25a98b *R/read_cajun.R
+c2a5af909d26a365d0df83f6f642c7fd *R/read_cajun.R
 ea34bf2f9700425b57aafd460518a3b8 *R/read_pvolfile.R
 1b2b9c2c0c28845d71e2a0d9192402d7 *R/read_vpfiles.R
 b553b2ebebeff3217ecfaf4e6b4de3d3 *R/read_vpts.R
@@ -63,7 +63,7 @@ b5e37fd17ecd33279d58770fd92377a0 *R/vpfile.R
 f64deaf094ffef8f582cfc177649a79d *R/vpts.R
 08e89dd9dc13941d18c8036e23af0329 *R/write_pvolfile.R
 c138b565245bd323e168209aa7a92b9a *R/zzz.R
-6bf801c8407bfcb6889ab5b942ae342a *README.md
+9dcf11959783d40b396ac03f5baf6ae1 *README.md
 0c6ad5b3446721162c89589e8077ab1c *build/partial.rdb
 24cba3a9f537925866f0565dbedcbccc *build/vignette.rds
 d46dae4bac00e1a58e7aea08d55117c6 *data/example_scan.rda
@@ -71,10 +71,10 @@ d46dae4bac00e1a58e7aea08d55117c6 *data/example_scan.rda
 bc611624121a1b871d255197bdd78ac5 *data/example_vpts.rda
 450623c66edf341958907b93c38fba9c *inst/CITATION
 2f3fbfbcb51f9d62d36995d7e58a8e71 *inst/doc/bioRad.Rmd
-44097c6c96ba5e2ce101241de99053f2 *inst/doc/bioRad.html
+da1f974091269fcce145119bc443f4be *inst/doc/bioRad.html
 697068b929746a024aede121a14a4972 *inst/doc/rad_aero_19.R
-69ea0963b9e8dd5147138fda90e5f0c7 *inst/doc/rad_aero_19.Rmd
-3cd7dda6f95f92a53120c47a5669817b *inst/doc/rad_aero_19.html
+44c15b50f59a835d81616f1f86a3442b *inst/doc/rad_aero_19.Rmd
+7394eea5176412feb19acee8b69623ee *inst/doc/rad_aero_19.html
 58cad395ca3583194d3dbc69ed9a8a19 *inst/doc/range_correction.R
 fb33ab16c18657c1659e7474b9d2a896 *inst/doc/range_correction.Rmd
 ecb550190daec4584ba92a31a9a90831 *inst/doc/range_correction.html
@@ -114,7 +114,7 @@ ef678c31bad5ef76a96e62d66151fc72 *man/download_basemap.Rd
 0d1e6c3f449b9195716b11b7dbd4908b *man/example_vp.Rd
 855832b03eeeaead38c768add6ef7506 *man/example_vpts.Rd
 ace07ca9621ac4411255a995ea2b3361 *man/figures/README-plot_ppi-1.png
-89d550340dc355a2357e654769e35d27 *man/figures/README-plot_vpi-1.png
+94357f7426d82c226039d9c526d01d10 *man/figures/README-plot_vpi-1.png
 5c4bd87752b3206000ed602fdbe42da5 *man/figures/README-plot_vpts-1.png
 76824fe4d7fff93b01d6c71d68591332 *man/figures/logo.png
 fa93fdbcdda3dfaca8860e2c489d6849 *man/filter_vpts.Rd
@@ -125,7 +125,7 @@ a9884a78dee2986894c65700ec34f9cd *man/get_odim_object_type.Rd
 eb019598d7e3664c4e36a2617c2bf778 *man/get_param.Rd
 9ef9ce98c01ceb1930c0250b7af261a8 *man/get_quantity.Rd
 b4a9a91ec47aae6ab1fde67ea3987b37 *man/get_scan.Rd
-2a7a9f76142f595c97386271ad09ba80 *man/integrate_profile.Rd
+5ee77bab41dc8e37ebef1cefc09cd586 *man/integrate_profile.Rd
 d7aaef0184502ee413db5fbfffac8319 *man/integrate_to_ppi.Rd
 62a09aa0b4036561553e15d1e91e58ce *man/is.nan.data.frame.Rd
 d69e1b7dcadad3a6d4d890b90153027c *man/is.pvolfile.Rd
@@ -184,7 +184,7 @@ eebd4891a17bbf665afaaa3301d8540a *tests/testthat/test-check_night.R
 a138630ff57853f6fc4f8cac2732b3b9 *tests/testthat/test-composite_ppi.R
 ee29ae18513db39e14ab1070c38d77ce *tests/testthat/test-convert_legacy.R
 8a5e9ba2a713a12b4972e6ac89fa33f3 *tests/testthat/test-data.R
-366c7dc2069130f584c6984a6fada3cb *tests/testthat/test-dbz_eta.R
+a4d056d9d8d52fefefd84129d892a520 *tests/testthat/test-dbz_eta.R
 407d1ddf7815eb65c544cbe1d6b306a4 *tests/testthat/test-docker.R
 2cd4d555c8bedda452331de4c8f69c51 *tests/testthat/test-download_basemap.R
 56e9b408c98480a697212ddbc9eda683 *tests/testthat/test-download_pvolfiles.R
@@ -229,5 +229,5 @@ dd480a1f9f4447184371a57ca8410dc2 *tests/testthat/test-vpi.R
 f1b0fc5d995cbae69bf4191785830a7d *tests/testthat/test-vpts.R
 8afde4a542881004d315c6123fd21de8 *tests/testthat/test-write_pvolfile.R
 2f3fbfbcb51f9d62d36995d7e58a8e71 *vignettes/bioRad.Rmd
-69ea0963b9e8dd5147138fda90e5f0c7 *vignettes/rad_aero_19.Rmd
+44c15b50f59a835d81616f1f86a3442b *vignettes/rad_aero_19.Rmd
 fb33ab16c18657c1659e7474b9d2a896 *vignettes/range_correction.Rmd

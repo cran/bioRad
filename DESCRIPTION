@@ -1,6 +1,6 @@
 Package: bioRad
 Title: Biological Analysis and Visualization of Weather Radar Data
-Version: 0.6.1
+Version: 0.6.2
 Description: Extract, visualize and summarize aerial movements of birds and
     insects from weather radar data. See <doi:10.1111/ecog.04028>
     for a software paper describing package and methodologies.
@@ -35,7 +35,7 @@ Encoding: UTF-8
 VignetteBuilder: knitr
 RoxygenNote: 7.2.1
 NeedsCompilation: no
-Packaged: 2022-08-30 21:37:36 UTC; amd427
+Packaged: 2022-12-16 17:21:51 UTC; amd427
 Author: Adriaan M. Dokter [aut, cre] (<https://orcid.org/0000-0001-6573-066X>),
   Peter Desmet [aut] (<https://orcid.org/0000-0002-8442-8025>),
   Bart Hoekstra [ctb] (<https://orcid.org/0000-0002-7085-3805>),
@@ -50,4 +50,4 @@ Author: Adriaan M. Dokter [aut, cre] (<https://orcid.org/0000-0001-6573-066X>),
   Liesbeth Verlinden [ctb] (<https://orcid.org/0000-0003-1744-9325>)
 Maintainer: Adriaan M. Dokter <amd427@cornell.edu>
 Repository: CRAN
-Date/Publication: 2022-08-30 22:30:09 UTC
+Date/Publication: 2022-12-17 00:10:02 UTC
