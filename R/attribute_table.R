@@ -11,7 +11,7 @@
 #' This function only tabulates attributes of the scans.
 #'
 #' @export
-#'
+#' @returns A data.frame with the attributes of the scan(s)
 #' @examples
 #' data(example_scan)
 #' attribute_table(example_scan)
@@ -32,8 +32,10 @@ attribute_table <-
              "how.NI"
            ),
            ...) {
-    assert_that(inherits(x, "scan") | inherits(x, "pvol"))
-    assert_that(is.character(select) | is.null(select))
+    assertthat::assert_that(inherits(x, "scan") | inherits(x, "pvol"),
+                            msg = "`x` must be a pvol or scan object")
+    assertthat::assert_that(is.character(select) | is.null(select),
+                            msg = "when provided, `select` must be a character vector")
     if (inherits(x, "pvol")) {
       df <-
         do.call(

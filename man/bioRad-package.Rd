@@ -8,18 +8,17 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Extract, visualize and summarize aerial movements of birds and insects from weather radar data. See \doi{10.1111/ecog.04028} for a software paper describing package and methodologies.
+Extract, visualize and summarize aerial movements of birds and insects from weather radar data. See Dokter, A. M. et al. (2018) "bioRad: biological analysis and visualization of weather radar data" \doi{10.1111/ecog.04028} for a software paper describing package and methodologies.
 }
 \details{
 To get started, see:
-
 \itemize{
-\item Dokter et al. (2019) \doi{10.1111/ecog.04028}: a
-paper describing the package.
-\item \href{https://adriaandokter.com/bioRad/articles/bioRad.html}{bioRad
-vignette}: an introduction to bioRad's main functionalities.
-\item \href{https://adriaandokter.com/bioRad/reference/index.html}{Function
-reference}: an overview of all bioRad functions.
+\item Dokter et al. (2019) \doi{10.1111/ecog.04028}: a paper describing the
+package.
+\item \href{https://adriaandokter.com/bioRad/articles/bioRad.html}{bioRad vignette}:
+an introduction to bioRad's main functionalities.
+\item \href{https://adriaandokter.com/bioRad/reference/index.html}{Function reference}
+: an overview of all bioRad functions.
 }
 }
 \seealso{
@@ -37,18 +36,20 @@ Useful links:
 Authors:
 \itemize{
   \item Peter Desmet \email{peter.desmet@inbo.be} (\href{https://orcid.org/0000-0002-8442-8025}{ORCID})
+  \item Bart Kranstauber \email{b.kranstauber@uva.nl} (\href{https://orcid.org/0000-0001-8303-780X}{ORCID})
+  \item Cecilia Nilsson \email{cecilia.nilsson709@gmail.com} (\href{https://orcid.org/0000-0001-8957-4411}{ORCID})
   \item Stijn Van Hoey \email{stijnvanhoey@gmail.com} (\href{https://orcid.org/0000-0001-6413-3185}{ORCID})
 }
 
 Other contributors:
 \itemize{
   \item Bart Hoekstra \email{b.d.hoekstra@uva.nl} (\href{https://orcid.org/0000-0002-7085-3805}{ORCID}) [contributor]
-  \item Bart Kranstauber \email{b.kranstauber@uva.nl} (\href{https://orcid.org/0000-0001-8303-780X}{ORCID}) [contributor]
+  \item Pieter Huybrechts \email{pieter.huybrechts@inbo.be} (\href{https://orcid.org/0000-0002-6658-6062}{ORCID}) [contributor]
   \item Hidde Leijnse \email{hidde.leijnse@knmi.nl} (\href{https://orcid.org/0000-0001-7835-4480}{ORCID}) [contributor]
-  \item Cecilia Nilsson \email{cecilia.nilsson709@gmail.com} (\href{https://orcid.org/0000-0001-8957-4411}{ORCID}) [contributor]
-  \item Nicolas Noé  \email{nicolas@niconoe.eu} (\href{https://orcid.org/0000-0002-9503-4750}{ORCID}) [contributor]
+  \item Nicolas Noé \email{nicolas@niconoe.eu} (\href{https://orcid.org/0000-0002-9503-4750}{ORCID}) [contributor]
   \item Raphaël Nussbaumer \email{rafnuss@gmail.com} (\href{https://orcid.org/0000-0002-8185-1020}{ORCID}) [contributor]
   \item Jurriaan Spaaks \email{j.spaaks@esciencecenter.nl} [contributor]
+  \item Alexander Tedeschi \email{alexander.tedeschi@cornell.edu} (\href{https://orcid.org/0000-0003-0772-6931}{ORCID}) [contributor]
   \item Lourens Veen \email{l.veen@esciencecenter.nl} [contributor]
   \item Liesbeth Verlinden \email{l.verlinden@uva.nl} (\href{https://orcid.org/0000-0003-1744-9325}{ORCID}) [contributor]
 }

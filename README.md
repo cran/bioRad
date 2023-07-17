@@ -7,7 +7,9 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bioRad)](https://cran.r-project.org/package=bioRad)
-[![R-CMD-check](https://github.com/adokter/bioRad/workflows/R-CMD-check/badge.svg)](https://github.com/adokter/bioRad/actions)
+[![R-CMD-check](https://github.com/adokter/bioRad/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/adokter/bioRad/actions/workflows/R-CMD-check.yaml)
+[![repo
+status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![codecov](https://codecov.io/gh/adokter/bioRad/branch/master/graph/badge.svg?token=pDmyO4JVJu)](https://app.codecov.io/gh/adokter/bioRad)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3370004.svg)](https://doi.org/10.5281/zenodo.3370004)
 <!-- badges: end -->
@@ -45,18 +47,22 @@ Documentation for the latest development version can be found
 
 ## Installation
 
-bioRad depends on packages from both the
-[CRAN](https://CRAN.R-project.org) and
-[Bioconductor](https://www.bioconductor.org/) repositories. Enable both
-with:
+### Install system libraries
 
-``` r
-setRepositories(ind = 1:2)
-```
+For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5
+libraries need to be installed as system libraries prior to
+installation, which are required by dependency package
+**[vol2birdR](https://adriaandokter.com/vol2birdR/)**:
+
+| System                                      | Command                                                           |
+|:--------------------------------------------|:------------------------------------------------------------------|
+| **OS X (using Homebrew)**                   | `brew install hdf5 proj gsl`                                      |
+| **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev` |
+| **Systems supporting yum and RPMs**         | `sudo yum install hdf5-devel proj-devel gsl gsl-devel`            |
 
 <details>
 <summary>
-Required system libraries on Linux (Ubuntu)
+Additional required system libraries on Linux (Ubuntu)
 </summary>
 
 The following system libraries are required before installing bioRad on
@@ -68,7 +74,11 @@ Linux systems. In terminal, install these with:
 
 </details>
 
-<br> You can install the released version of bioRad from
+<br>
+
+### Install bioRad
+
+You can install the released version of bioRad from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
@@ -87,73 +97,22 @@ Then load the package with:
 
 ``` r
 library(bioRad)
-#> Welcome to bioRad version 0.6.2
-#> Docker daemon running, Docker functionality enabled (vol2bird version 0.5.0.9169, MistNet available)
+#> Welcome to bioRad version 0.7.1
+#> using vol2birdR version 1.0.1 (MistNet installed)
 ```
 
-### Docker (optional)
+### (optional) Enable MistNet
 
-You need to install Docker to:
+To enable MistNet, the following vol2birdR commands should be executed:
 
--   Process radar data into vertical profiles of biological targets with
-    `calculate_vp()`.
--   Read [NEXRAD radar data](https://registry.opendata.aws/noaa-nexrad/)
-    or [IRIS
-    RAW](ftp://ftp.sigmet.com/outgoing/manuals//IRIS-Programming-Guide-M211318EN.pdf)
-    data with `read_pvolfile()`. Docker is not required for reading ODIM
-    radar data.
--   Convert NEXRAD radar data to ODIM format with `nexrad_to_odim()`.
--   Use the [MistNet](https://doi.org/10.1111/2041-210X.13280) neural
-    network with `calculate_vp()` or `apply_mistnet()`
+``` r
+vol2birdR::install_mistnet()
+vol2birdR::install_mistnet_model()
+```
 
-Why? bioRad makes use of a [C implementation of the
-vol2bird](https://github.com/adokter/vol2bird) algorithm through
-[Docker](https://www.docker.com/) to do the above. All other bioRad
-functions will work without a Docker installation.
-
-<details>
-<summary>
-Installing Docker
-</summary>
-
-1.  Go to [Docker
-    Desktop](https://www.docker.com/products/docker-desktop/).
-2.  Download Docker for Windows or Mac (free login required) and follow
-    the installation instructions. Note that Docker for Windows requires
-    Microsoft Windows 10 Professional or Enterprise 64-bit: installing
-    Docker *Toolbox* for previous Windows versions will not work.
-3.  Open the Docker application. The Docker (whale) icon will appear in
-    your menu or task bar and indicate if it is running correctly.
-4.  Make local drive(s) available for Docker containers:
-    -   On Windows: right click the Docker icon \> `Settings` \>
-        `Shared drives` \> Select the drive(s) where you will be
-        processing radar files \> Click `Apply`.
-    -   On Mac: click the Docker icon \> `Preferences` \> `File sharing`
-        \> Add the drive(s) where you will be processing radar files \>
-        Click `Apply & Restart`.
-5.  In R do `check_docker()`.
-6.  You can now use the bioRad functionality that requires Docker.
-
-</details>
-<details>
-<summary>
-Known issues with Docker
-</summary>
-
-1.  Hyper-V / Virtualbox conflicts on Windows. Docker requires Hyper-V
-    enabled, but Hyper-V can not run together with Virtualbox. To use
-    Virtualbox you will need to disable Hyper-V, which also disables
-    Docker, and requires a reboot of the system.
-2.  For firewall issues on Windows, see [this
-    issue](https://github.com/adokter/bioRad/issues/128)
-3.  For permission issues when running docker, specifically the error
-    `Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock`,
-    see
-    [this](https://techoverflow.net/2018/12/15/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket/)
-    solution. Running `sudo usermod -a -G docker $USER` in a terminal
-    will fix this problem.
-
-</details>
+Read the [vol2birdR
+documentation](https://adriaandokter.com/vol2birdR/articles/vol2birdR.html)
+for more details.
 
 ## Usage
 
@@ -202,7 +161,6 @@ plot it with `plot()`:
 example_vpts %>%
   regularize_vpts() %>%
   plot()
-#> projecting on 300 seconds interval grid...
 ```
 
 <img src="man/figures/README-plot_vpts-1.png" width="100%" />

@@ -16,6 +16,7 @@ calculate_vp(
   rcs = 11,
   dual_pol = TRUE,
   rho_hv = 0.95,
+  single_pol = TRUE,
   elev_min = 0,
   elev_max = 90,
   azim_min = 0,
@@ -44,7 +45,7 @@ supported by the \href{https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{RSL 
 IRIS (IRIS RAW) format.}
 
 \item{vpfile}{Character. File name. When provided, writes a vertical profile
-file (\code{vpfile}) in the ODIM HDF5 format to disk.}
+file (\code{vpfile}) either in the VPTS CSV or ODIM HDF5 format to disk.}
 
 \item{pvolfile_out}{Character. File name. When provided, writes a polar
 volume (\code{pvol}) file in the ODIM HDF5 format to disk. Useful for converting
@@ -53,14 +54,14 @@ RSL formats to ODIM.}
 \item{autoconf}{Logical. When \code{TRUE}, default optimal configuration settings
 are selected automatically and other user settings are ignored.}
 
-\item{verbose}{Logical. When \code{TRUE}, Docker \code{stdout} is piped to the R
-console. Always \code{TRUE} on Windows.}
+\item{verbose}{Logical. When \code{TRUE}, vol2bird \code{stdout} is piped to the R
+console.}
 
 \item{warnings}{Logical. When \code{TRUE}, vol2bird warnings are piped to the R
 console.}
 
 \item{mount}{Character. Directory path of the mount point for the Docker
-container.}
+container (deprecated).}
 
 \item{sd_vvp_threshold}{Numeric. Lower threshold for the radial velocity
 standard deviation (profile quantity \code{sd_vvp}) in m/s. Biological signals
@@ -71,11 +72,13 @@ C-band radars and 1 m/s for S-band radars.}
 
 \item{dual_pol}{Logical. When \code{TRUE}, uses dual-pol mode, in which
 meteorological echoes are filtered using the correlation coefficient
-\code{rho_hv}. When \code{FALSE}, uses single polarization mode based only on
-reflectivity and radial velocity quantities.}
+threshold \code{rho_hv}.}
 
 \item{rho_hv}{Numeric. Lower threshold in correlation coefficient to use for
 filtering meteorological scattering.}
+
+\item{single_pol}{Logical. When \code{TRUE}, uses precipitation filtering in single
+polarization mode based on reflectivity and radial velocity quantities.}
 
 \item{elev_min}{Numeric. Minimum elevation angle to include, in degrees.}
 
@@ -115,7 +118,7 @@ scans at 0.5, 1.5, 2.5, 3.5 and 4.5 degrees. Specifying different elevation
 angles may compromise segmentation results.}
 
 \item{local_install}{Character. Path to local vol2bird installation (e.g.
-\code{your/vol2bird_install_directory/vol2bird/bin/vol2bird.sh}).}
+\code{your/vol2bird_install_directory/vol2bird/bin/vol2bird.sh}). (deprecated)}
 
 \item{local_mistnet}{Character. Path to local MistNet segmentation model in
 PyTorch format (e.g. \verb{/your/path/mistnet_nexrad.pt}).}
@@ -128,14 +131,12 @@ A vertical profile object of class \code{vp}. When defined, output files
 Calculates a vertical profile of biological scatterers (\code{vp}) from a polar
 volume (\code{pvol}) file using the algorithm
 \href{https://github.com/adokter/vol2bird/}{vol2bird} (Dokter et al.
-2011 \doi{10.1098/rsif.2010.0116}). Requires a running
-\href{https://www.docker.com/}{Docker} daemon, unless a local installation of
-vol2bird is specified with \code{local_install}.
+2011 \doi{10.1098/rsif.2010.0116}).
 }
 \details{
 \subsection{Typical use}{
 
-Common arguments set by users are \code{file}, \code{vpfile}, \code{autoconf} and \code{mount}.
+Common arguments set by users are \code{file}, \code{vpfile} and \code{autoconf}.
 Turn on \code{autoconf} to automatically select the optimal parameters for a given
 radar file. The default for C-band data is to apply rain-filtering in single
 polarization mode and dual polarization mode when available. The default for
@@ -145,15 +146,6 @@ only.
 Arguments that sometimes require non-default values are: \code{rcs},
 \code{sd_vvp_threshold}, \code{range_max}, \code{dual_pol}, \code{dealias}. Other arguments are
 typically left at their defaults.
-}
-
-\subsection{mount}{
-
-On repeated calls of \code{\link[=calculate_vp]{calculate_vp()}}, the Docker container mount can be
-recycled from one call to the next if subsequent calls share the same \code{mount}
-argument. Re-mounting a Docker container takes time, therefore it is advised
-to choose a mount point that is a parent directory of all volume files to be
-processed, such that \code{\link[=calculate_vp]{calculate_vp()}} calls are as fast as possible.
 }
 
 \subsection{sd_vvp_threshold}{
@@ -216,24 +208,12 @@ Dealiasing uses the torus mapping method by Haase et al. (2004).
 
 \subsection{Local installation}{
 
-You can bypass the Docker container and speed up processing by installing
-vol2bird locally (not on Windows). Point \code{local_install} to the path of your
-local vol2bird executable, e.g.
-\verb{/your/vol2bird_install_directory/vol2bird/bin/vol2bird}. Your local vol2bird
-executable will be called through a bash login shell. \code{LD_LIBRARY_PATH}
-(Linux) or \code{DYLD_LIBRARY_PATH} (Mac) should be correctly specified in your
-\code{.bashrc} or \code{.bash_profile} file and contain all the required shared
-libraries by vol2bird. See vol2bird installation pages on
-\href{https://github.com/adokter/vol2bird}{GitHub} for details.
-
-When using MistNet with a local vol2bird installation, also point parameter
-\code{local_mistnet} to your local download of the MistNet segmentation model in
+You may point parameter \code{local_mistnet} to a local download of the MistNet segmentation model in
 PyTorch format, e.g. \verb{/your/path/mistnet_nexrad.pt}. The MistNet model can
 be downloaded at \url{https://s3.amazonaws.com/mistnet/mistnet_nexrad.pt}.
 }
 }
 \examples{
-\dontrun{
 # Locate and read the polar volume example file
 pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
 
@@ -248,7 +228,6 @@ vp
 
 # Clean up
 file.remove("~/volume.h5")
-}
 }
 \references{
 Dokter et al. (2011) is the main reference for the profiling algorithm

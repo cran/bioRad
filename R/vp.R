@@ -66,6 +66,8 @@
 #' * [as.data.frame.vp()]
 #' * [bind_into_vpts()]
 #'
+#' @return For [summary.vp()]: prints summary of the `vp` object.
+#'
 #' @examples
 #' # Check if an object is of class vp
 #' is.vp(example_vp)
@@ -87,7 +89,7 @@ summary.vp <- function(object, ...) {
 print.vp <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
   stopifnot(inherits(x, "vp"))
   if (is.null(x$data[["height"]])) {
-    warning(glue("`x` is a legacy `vp` object without a column `height`. ",
+    warning(glue::glue("`x` is a legacy `vp` object without a column `height`. ",
             "Use convert_legacy() to avoid errors."))
     x <- convert_legacy(x)
   }
@@ -139,11 +141,15 @@ dim.vp <- function(x) {
 #'
 #' @export
 #'
+#' @examples
+#' # concatenate vp objects into a list:
+#' c(example_vp, example_vp)
+#'
 #' @seealso [bind_into_vpts()]
 c.vp <- function(...) {
   vp_list <- list(...)
-  is_vp <- sapply(vp_list, function(x) is(x, "vp"))
-  assert_that(all(is_vp), msg = "Each element must be a `vp` object.")
+  is_vp <- sapply(vp_list, function(x) methods::is(x, "vp"))
+  assertthat::assert_that(all(is_vp), msg = "Each element must be a `vp` object.")
   # extract radar identifiers
   radars <- unique(sapply(vp_list, "[[", "radar"))
   if (length(radars) > 1) {

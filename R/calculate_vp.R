@@ -3,9 +3,7 @@
 #' Calculates a vertical profile of biological scatterers (`vp`) from a polar
 #' volume (`pvol`) file using the algorithm
 #' [vol2bird](https://github.com/adokter/vol2bird/) (Dokter et al.
-#' 2011 \doi{10.1098/rsif.2010.0116}). Requires a running
-#' [Docker](https://www.docker.com/) daemon, unless a local installation of
-#' vol2bird is specified with `local_install`.
+#' 2011 \doi{10.1098/rsif.2010.0116}).
 #'
 #' @param file Character (vector). Either a path to a single radar polar volume
 #'   (`pvol`) file containing multiple scans/sweeps, or multiple paths to scan
@@ -17,18 +15,18 @@
 #'   library](https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/) or 3) Vaisala
 #'   IRIS (IRIS RAW) format.
 #' @param vpfile Character. File name. When provided, writes a vertical profile
-#'   file (`vpfile`) in the ODIM HDF5 format to disk.
+#'   file (`vpfile`) either in the VPTS CSV or ODIM HDF5 format to disk.
 #' @param pvolfile_out Character. File name. When provided, writes a polar
 #'   volume (`pvol`) file in the ODIM HDF5 format to disk. Useful for converting
 #'   RSL formats to ODIM.
 #' @param autoconf Logical. When `TRUE`, default optimal configuration settings
 #'   are selected automatically and other user settings are ignored.
-#' @param verbose Logical. When `TRUE`, Docker `stdout` is piped to the R
-#'   console. Always `TRUE` on Windows.
+#' @param verbose Logical. When `TRUE`, vol2bird `stdout` is piped to the R
+#'   console.
 #' @param warnings Logical. When `TRUE`, vol2bird warnings are piped to the R
 #'   console.
 #' @param mount Character. Directory path of the mount point for the Docker
-#'   container.
+#'   container (deprecated).
 #' @param sd_vvp_threshold Numeric. Lower threshold for the radial velocity
 #'   standard deviation (profile quantity `sd_vvp`) in m/s. Biological signals
 #'   with `sd_vvp < sd_vvp_threshold` are set to zero. Defaults to 2 m/s for
@@ -36,10 +34,11 @@
 #' @param rcs Numeric. Radar cross section per bird to use, in cm^2.
 #' @param dual_pol Logical. When `TRUE`, uses dual-pol mode, in which
 #'   meteorological echoes are filtered using the correlation coefficient
-#'   `rho_hv`. When `FALSE`, uses single polarization mode based only on
-#'   reflectivity and radial velocity quantities.
+#'   threshold `rho_hv`.
 #' @param rho_hv Numeric. Lower threshold in correlation coefficient to use for
 #'   filtering meteorological scattering.
+#' @param single_pol Logical. When `TRUE`, uses precipitation filtering in single
+#' polarization mode based on reflectivity and radial velocity quantities.
 #' @param elev_min Numeric. Minimum elevation angle to include, in degrees.
 #' @param elev_max Numeric. Maximum elevation angle to include, in degrees.
 #' @param azim_min Numeric. Minimum azimuth to include, in degrees clockwise
@@ -65,7 +64,7 @@
 #'   scans at 0.5, 1.5, 2.5, 3.5 and 4.5 degrees. Specifying different elevation
 #'   angles may compromise segmentation results.
 #' @param local_install Character. Path to local vol2bird installation (e.g.
-#'   `your/vol2bird_install_directory/vol2bird/bin/vol2bird.sh`).
+#'   `your/vol2bird_install_directory/vol2bird/bin/vol2bird.sh`). (deprecated)
 #' @param local_mistnet Character. Path to local MistNet segmentation model in
 #'   PyTorch format (e.g. `/your/path/mistnet_nexrad.pt`).
 #'
@@ -77,7 +76,7 @@
 #' @details
 #' ## Typical use
 #'
-#' Common arguments set by users are `file`, `vpfile`, `autoconf` and `mount`.
+#' Common arguments set by users are `file`, `vpfile` and `autoconf`.
 #' Turn on `autoconf` to automatically select the optimal parameters for a given
 #' radar file. The default for C-band data is to apply rain-filtering in single
 #' polarization mode and dual polarization mode when available. The default for
@@ -87,14 +86,6 @@
 #' Arguments that sometimes require non-default values are: `rcs`,
 #' `sd_vvp_threshold`, `range_max`, `dual_pol`, `dealias`. Other arguments are
 #' typically left at their defaults.
-#'
-#' ## mount
-#'
-#' On repeated calls of [calculate_vp()], the Docker container mount can be
-#' recycled from one call to the next if subsequent calls share the same `mount`
-#' argument. Re-mounting a Docker container takes time, therefore it is advised
-#' to choose a mount point that is a parent directory of all volume files to be
-#' processed, such that [calculate_vp()] calls are as fast as possible.
 #'
 #' ## sd_vvp_threshold
 #'
@@ -150,18 +141,7 @@
 #'
 #' ## Local installation
 #'
-#' You can bypass the Docker container and speed up processing by installing
-#' vol2bird locally (not on Windows). Point `local_install` to the path of your
-#' local vol2bird executable, e.g.
-#' `/your/vol2bird_install_directory/vol2bird/bin/vol2bird`. Your local vol2bird
-#' executable will be called through a bash login shell. `LD_LIBRARY_PATH`
-#' (Linux) or `DYLD_LIBRARY_PATH` (Mac) should be correctly specified in your
-#' `.bashrc` or `.bash_profile` file and contain all the required shared
-#' libraries by vol2bird. See vol2bird installation pages on
-#' [GitHub](https://github.com/adokter/vol2bird) for details.
-#'
-#' When using MistNet with a local vol2bird installation, also point parameter
-#' `local_mistnet` to your local download of the MistNet segmentation model in
+#' You may point parameter `local_mistnet` to a local download of the MistNet segmentation model in
 #' PyTorch format, e.g. `/your/path/mistnet_nexrad.pt`. The MistNet model can
 #' be downloaded at <https://s3.amazonaws.com/mistnet/mistnet_nexrad.pt>.
 #'
@@ -190,7 +170,6 @@
 #' (11), pp. 1908-22. \doi{10.1111/2041-210X.13280}
 #'
 #' @examples
-#' \dontrun{
 #' # Locate and read the polar volume example file
 #' pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
 #'
@@ -205,12 +184,11 @@
 #'
 #' # Clean up
 #' file.remove("~/volume.h5")
-#' }
 calculate_vp <- function(file, vpfile = "", pvolfile_out = "",
                          autoconf = FALSE, verbose = FALSE, warnings = TRUE,
                          mount, sd_vvp_threshold,
-                         rcs = 11, dual_pol = TRUE, rho_hv = 0.95, elev_min = 0,
-                         elev_max = 90, azim_min = 0, azim_max = 360,
+                         rcs = 11, dual_pol = TRUE, rho_hv = 0.95, single_pol = TRUE,
+                         elev_min = 0, elev_max = 90, azim_min = 0, azim_max = 360,
                          range_min = 5000, range_max = 35000, n_layer = 20,
                          h_layer = 200, dealias = TRUE,
                          nyquist_min = if (dealias) 5 else 25,
@@ -224,8 +202,8 @@ calculate_vp <- function(file, vpfile = "", pvolfile_out = "",
       vpfile = vpfile, pvolfile_out = pvolfile_out,
       autoconf = autoconf, verbose = verbose, warnings = warnings,
       mount = mount, sd_vvp_threshold = sd_vvp_threshold,
-      rcs = rcs, dual_pol = dual_pol, rho_hv = rho_hv, elev_min = elev_min,
-      elev_max = 90, azim_min = 0, azim_max = 360,
+      rcs = rcs, dual_pol = dual_pol, rho_hv = rho_hv, single_pol = single_pol,
+      elev_min = elev_min, elev_max = 90, azim_min = 0, azim_max = 360,
       range_min = range_min, range_max = range_max, n_layer = n_layer,
       h_layer = h_layer, dealias = dealias,
       nyquist_min = nyquist_min,
@@ -239,305 +217,182 @@ calculate_vp <- function(file, vpfile = "", pvolfile_out = "",
     file.remove(tmp_pvol_file)
     return(res)
   }
-
+  rlang::check_installed("vol2birdR", format_reason_vol2bird("to run `calculate_vp`."))
   # check input arguments
-  assert_that(
+  assertthat::assert_that(
     is.character(file),
     msg = "`file` must be a path to a file (or a vector of paths to files)."
   )
   for (filename in file) {
-    assert_that(file.exists(filename))
+    assertthat::assert_that(file.exists(filename))
   }
-  if (!are_equal(vpfile, "")) {
-    assert_that(is.writeable(dirname(vpfile)))
+  if (!assertthat::are_equal(vpfile, "")) {
+    assertthat::assert_that(assertthat::is.writeable(dirname(vpfile)))
   }
-  if (!are_equal(pvolfile_out, "")) {
-    assert_that(is.writeable(dirname(pvolfile_out)))
+  if (!assertthat::are_equal(pvolfile_out, "")) {
+    assertthat::assert_that(assertthat::is.writeable(dirname(pvolfile_out)))
   }
   if (!is.logical(mistnet)) {
     stop("`mistnet` must be a logical value.")
   }
-  if (mistnet){
-    if(missing(local_mistnet)){
-      if (!.pkgenv$mistnet) {
-        stop("MistNet has not been installed, see update_docker() for install instructions.")
+  if (mistnet) {
+    if (missing(local_mistnet)) {
+      if (!vol2birdR::mistnet_exists()) {
+        stop("MistNet has not been installed, see vol2birdR package documentation for install instructions.")
       }
-    }
-    else{
-      if(!file.exists(local_mistnet)){
-        stop(paste0("'",local_mistnet,"' does not exist, `local_mistnet` should specify the path of MistNet segmentation model"))
+    } else {
+      if (!file.exists(local_mistnet)) {
+        stop(paste0("'", local_mistnet, "' does not exist, `local_mistnet` should specify the path of MistNet segmentation model"))
       }
     }
   }
   if (!is.logical(dealias)) {
     stop("`dealias` must be a logical value.")
   }
-  if(missing(mount))  {
-    mount<-dirname(file[1])
+  if (!missing(mount)) {
+    warning("mount argument is deprecated")
   }
-  if (file.access(mount, 0) == -1) {
-    stop(glue("Can't find `mount` directory: {mount}"))
-  }
-  if (file.access(mount, 2) == -1) {
-    stop(glue("No write permission to `mount` directory: {mount}"))
-  }
-  if ((missing(local_install) && !missing(local_mistnet)) || (!missing(local_install) && missing(local_mistnet) && mistnet)) {
-    stop("To use local vol2bird and MistNet model, specify both `local_install` and `local_mistnet`.")
+  if (!missing(local_install)) {
+    warning("local_install argument is deprecated")
   }
 
-  assert_that(is.numeric(mistnet_elevations))
-  assert_that(length(mistnet_elevations) == 5)
-  if (!.pkgenv$docker && missing(local_install)) {
-    stop(
-      "Requires a running Docker daemon.\nTo enable calculate_vp(), start ",
-      "your local Docker daemon, and run check_docker() in R."
-    )
-  }
-  assert_that(is.flag(autoconf))
-  assert_that(is.flag(verbose))
-  assert_that(is.flag(warnings))
-  assert_that(is.writeable(mount))
+  assertthat::assert_that(is.numeric(mistnet_elevations))
+  assertthat::assert_that(length(mistnet_elevations) == 5)
+  assertthat::assert_that(assertthat::is.flag(autoconf))
+  assertthat::assert_that(assertthat::is.flag(verbose))
+  assertthat::assert_that(assertthat::is.flag(warnings))
   if (!missing(sd_vvp_threshold)) {
-    assert_that(is.number(sd_vvp_threshold))
-    assert_that(sd_vvp_threshold >= 0)
+    assertthat::assert_that(assertthat::is.number(sd_vvp_threshold))
+    assertthat::assert_that(sd_vvp_threshold >= 0)
   }
-  assert_that(is.number(rcs))
-  assert_that(rcs > 0)
-  assert_that(is.flag(dual_pol))
-  assert_that(is.number(rho_hv))
-  assert_that(
+  assertthat::assert_that(assertthat::is.number(rcs))
+  assertthat::assert_that(rcs > 0)
+  assertthat::assert_that(assertthat::is.flag(dual_pol))
+  assertthat::assert_that(assertthat::is.number(rho_hv))
+  assertthat::assert_that(assertthat::is.flag(single_pol))
+  assertthat::assert_that(
     rho_hv >= 0 & rho_hv <= 1,
     msg = "`rho_hv` must be a number between 0 and 1."
   )
-  assert_that(is.number(elev_min))
-  assert_that(
+  assertthat::assert_that(assertthat::is.number(elev_min))
+  assertthat::assert_that(
     elev_min >= -90 & elev_min <= 90,
     msg = "`elev_min` must be a number between -90 and 90."
   )
-  assert_that(is.number(elev_max))
-  assert_that(
+  assertthat::assert_that(assertthat::is.number(elev_max))
+  assertthat::assert_that(
     elev_max >= -90 & elev_max <= 90,
     msg = "`elev_max` must be a number between -90 and 90."
   )
-  assert_that(
+  assertthat::assert_that(
     elev_max > elev_min,
     msg = "`elev_max` must be larger than `elev_min`."
   )
-  assert_that(is.number(azim_min))
-  assert_that(
+  assertthat::assert_that(assertthat::is.number(azim_min))
+  assertthat::assert_that(
     azim_min >= 0 & azim_min <= 360,
     msg = "`azim_min` must be a number between 0 and 360."
   )
-  assert_that(is.number(azim_max))
-  assert_that(
+  assertthat::assert_that(assertthat::is.number(azim_max))
+  assertthat::assert_that(
     azim_max >= 0 & azim_max <= 360,
     msg = "`azim_max` must be a number between 0 and 360."
   )
-  assert_that(is.number(range_min))
-  assert_that(
+  assertthat::assert_that(assertthat::is.number(range_min))
+  assertthat::assert_that(
     range_min >= 0,
     msg = "`range_min` must be a positive number."
   )
-  assert_that(is.number(range_max))
-  assert_that(
+  assertthat::assert_that(assertthat::is.number(range_max))
+  assertthat::assert_that(
     range_max > 0,
     msg = "`range_max` must be a positive number."
   )
-  assert_that(
+  assertthat::assert_that(
     range_max > range_min,
     msg = "`range_max` must be larger than `range_min`."
   )
-  assert_that(is.count(n_layer))
-  assert_that(is.number(h_layer))
-  assert_that(
+  assertthat::assert_that(assertthat::is.count(n_layer))
+  assertthat::assert_that(assertthat::is.number(h_layer))
+  assertthat::assert_that(
     h_layer > 0,
     msg = "`h_layer` must be a positive number."
   )
-  assert_that(is.number(nyquist_min))
-  assert_that(
+  assertthat::assert_that(assertthat::is.number(nyquist_min))
+  assertthat::assert_that(
     nyquist_min > 0,
     msg = "`nyquist_min` must be a positive number."
   )
-  assert_that(
+  assertthat::assert_that(
     dbz_quantity %in% c("DBZ", "DBZH", "DBZV", "TH", "TV"),
     msg = "`dbz_quantity` must be either `DBZ`, `DBZH`, `DBZV`, `TH` or `TV`."
   )
-  assert_that(is.flag(mistnet))
-  assert_that(
-    !(mistnet && !.pkgenv$mistnet && missing(local_mistnet)),
-    msg = "Can't find MistNet installation, see update_docker() for install instructions.")
-  assert_that(is.flag(dealias))
-  assert_that(
-    .pkgenv$docker | !missing(local_install),
-    msg = glue(
-      "Requires a running Docker daemon.\nTo enable calculate_vp(), start ",
-      "your local Docker daemon, and run check_docker() in R."
-    )
-  )
+  assertthat::assert_that(assertthat::is.flag(mistnet))
+  assertthat::assert_that(
+    !(mistnet && !vol2birdR::mistnet_exists() && missing(local_mistnet)),
+    msg = "Can't find MistNet installation, see vol2birdR package for install instructions.")
+  assertthat::assert_that(assertthat::is.flag(dealias))
+
   filedir <- dirname(normalizePath(file[1], winslash = "/"))
-  assert_that(is.writeable(filedir))
-  assert_that(
-    grepl(normalizePath(mount, winslash = "/"), filedir, fixed = TRUE),
-    msg = "Mount point `mount` must be a parent directory of the input `file`."
-  )
+  assertthat::assert_that(assertthat::is.writeable(filedir))
 
-  # check whether vol2bird container supports multiple input files
-  multi_file_support <- !is.null(.pkgenv$vol2bird_version) && !is.na(.pkgenv$vol2bird_version) && .pkgenv$vol2bird_version > numeric_version("0.3.20")
-  if (!missing(local_install)) multi_file_support <- TRUE
-  assert_that(!(length(file) > 1 && !multi_file_support),
-    msg = glue(
-      "Current vol2bird installation does not support multiple input files. ",
-      "Provide a single input file containing a polar volume, or run ",
-      "update_docker() to update."
-    )
-  )
-
-  profile.tmp <- tempfile(tmpdir = filedir)
-
-  if (missing(local_install)) {
-    assert_that(
-      mount_docker_container(normalizePath(mount, winslash = "/")) == 0,
-      msg = "Failed to start vol2bird Docker container, see check_docker()."
-    )
-  }
-
-  # put options file in place, to be read by vol2bird container
-  opt.values <- c(
-    as.character(c(
-      rcs, rho_hv, elev_min, elev_max,
-      azim_min, azim_max, range_min, range_max,
-      n_layer, h_layer, nyquist_min, dbz_quantity
-    )),
-    if (dual_pol) "TRUE" else "FALSE",
-    if (dealias) "TRUE" else "FALSE"
-  )
-
-  opt.names <- c(
-    "SIGMA_BIRD", "RHOHVMIN", "ELEVMIN", "ELEVMAX",
-    "AZIMMIN", "AZIMMAX", "RANGEMIN", "RANGEMAX", "NLAYER",
-    "HLAYER", "MIN_NYQUIST_VELOCITY", "DBZTYPE", "DUALPOL",
-    "DEALIAS_VRAD"
-  )
-
-  if (!missing(sd_vvp_threshold)) {
-    opt.values <- c(as.character(sd_vvp_threshold), opt.values)
-    opt.names <- c("STDEV_BIRD", opt.names)
-  }
-
-  if (mistnet) {
-    opt.values <- c(
-      opt.values, "TRUE",
-      paste("{", paste(as.character(mistnet_elevations), collapse = ", "), paste = "}", sep = ""),
-      ifelse(missing(local_install), "/MistNet/mistnet_nexrad.pt", normalizePath(local_mistnet))
-    )
-    opt.names <- c(opt.names, "USE_MISTNET", "MISTNET_ELEVS", "MISTNET_PATH")
-  }
-
-  opt <- data.frame(
-    "option" = opt.names, "is" = rep("=", length(opt.values)),
-    "value" = opt.values
-  )
-  if (missing(local_install)) {
-    optfile <- paste(normalizePath(mount, winslash = "/"),
-      "/options.conf",
-      sep = ""
-    )
-  }
-  else {
-    optfile <- tempfile(fileext = '.conf')
-  }
-
-  if (file.exists(optfile)) {
-    optfile_save <- paste(optfile, ".", format(Sys.time(), "%Y%m%d%H%M%S"), sep = "")
-    warning(glue(
-      "`options.conf` file found in directory {mount}. Renamed to ",
-      "{basename(optfile_save)} to prevent overwrite."
-    ))
-    file.rename(optfile, optfile_save)
-  }
-
-  # only use user configuration when autoconfiguration is off.
-  if (!autoconf) {
-    write.table(opt,
-      file = optfile, col.names = FALSE,
-      row.names = FALSE, quote = FALSE
-    )
-  }
-
-  # prepare docker input filenames relative to mountpoint
-  prefixstart <- if (mount == "/") 1 else 2
-  prefix <- substring(
-    filedir,
-    prefixstart + nchar(normalizePath(mount, winslash = "/"))
-  )
-  if (nchar(prefix) > 0) {
-    prefix <- paste(prefix, "/", sep = "")
-  }
-
-
-  # we have a valid vol2bird version > 0.3.20, so we can use multiple file inputs
-  if (multi_file_support) {
-    pvolfile_docker <- paste("-i ", prefix, basename(file), sep = "", collapse = " ")
-    profile.tmp.docker <- paste("-o ", prefix, basename(profile.tmp), sep = "")
-    if (pvolfile_out != "") {
-      pvolfile_out_docker <- paste("-p ", prefix, basename(pvolfile_out), sep = "")
-    } else {
-      pvolfile_out_docker <- ""
-    }
-  }
-  else { # only single polar volume file input supported
-    pvolfile_docker <- paste(prefix, basename(file), sep = "")
-    profile.tmp.docker <- paste(prefix, basename(profile.tmp), sep = "")
-    if (pvolfile_out != "") {
-      pvolfile_out_docker <- paste(prefix, basename(pvolfile_out), sep = "")
-    } else {
-      pvolfile_out_docker <- ""
-    }
-  }
-
-  docker_command <- paste(
-    "docker exec vol2bird bash -c \"cd data && vol2bird ",
-    pvolfile_docker, profile.tmp.docker,
-    pvolfile_out_docker, "\""
-  )
-
-  # run vol2bird container
-  if (.Platform$OS.type == "unix") {
-    # on mac and linux:
-    if (missing(local_install)) {
-      result <- system(docker_command,
-        ignore.stdout = !verbose, ignore.stderr = !warnings
-      )
-    }
-    else {
-      assert_that(vol2bird_version(local_install) >= numeric_version("0.5.0.9187"),
-        msg = glue(
-          "Current vol2bird installation does not support using a custom path for the configuration file. Please update your vol2bird."
-        )
-      )
-      file_input_shell <- paste("-i ", format_file_for_shell(file), sep = "", collapse = " ")
-      profile_output_shell <- paste0(format_file_for_shell(dirname(profile.tmp)),"/",basename(profile.tmp))
-      cmd <- paste(local_install,"-c",optfile,file_input_shell,"-o",profile_output_shell)
-      if (pvolfile_out != "") {
-        volume_output_shell <- format_file_for_shell(pvolfile_out)
-        cmd <- paste(cmd,"-p", volume_output_shell)
-      }
-      # using a local install of vol2bird:
-      result <- system(glue('bash -l -c "{cmd}"'),
-        ignore.stdout = !verbose, ignore.stderr = !warnings
-      )
-    }
+  if (vpfile != '' && tools::file_ext(vpfile) == "csv"){
+    profile.tmp <- tempfile(fileext = ".csv")
   } else {
-    # on Windows platforms:
-    result <- suppressWarnings(system(docker_command))
+    profile.tmp <- tempfile(fileext = ".h5")
   }
-  if (result != 0) {
-    if (file.exists(optfile)) file.remove(optfile)
-    stop("Failed to run vol2bird.")
+
+  config <- vol2birdR::vol2bird_config()
+  if (!autoconf) {
+    config$birdRadarCrossSection <- rcs
+    config$rhohvThresMin <- rho_hv
+    config$elevMin <- elev_min
+    config$elevMax <- elev_max
+    config$azimMin <- azim_min
+    config$azimMax <- azim_max
+    config$rangeMin <- range_min
+    config$rangeMax <- range_max
+    config$nLayers <- n_layer
+    config$layerThickness <- h_layer
+    config$minNyquist <- nyquist_min
+    config$dbzType <- dbz_quantity
+    config$dualPol <- dual_pol
+    config$dealiasVrad <- dealias
+    if (!missing(sd_vvp_threshold)) config$stdDevMinBird <- sd_vvp_threshold
+  } else {
+    # setting stdDevMinBird triggers it to be set according to wavelength (1 m/s for S-band, 2 m/s for C-band)
+    config$stdDevMinBird <- -1
   }
+  config$mistNetElevs <- mistnet_elevations
+  config$useMistNet <- mistnet
+  if (!missing(local_mistnet) & mistnet) config$mistNetPath <- local_mistnet
+
+  # run vol2bird
+  ## use helper to allow vol2bird to silence output (vol2bird doesn't actually
+  ## use warnings)
+  vol2bird_warnings <-
+    function(warnings = TRUE, ...) {
+      if (warnings) {
+        vol2birdR::vol2bird(...)
+      } else
+      {
+        # write out to tempfile to prevent printing to console
+        utils::capture.output(vol2birdR::vol2bird(...), file = tempfile())
+      }
+
+    }
+
+  vol2bird_warnings(
+      file = file,
+      config = config,
+      vpfile = profile.tmp,
+      pvolfile_out = pvolfile_out,
+      verbose = verbose,
+      warnings = warnings
+  )
 
   # read output into a vp object
-  output <- read_vpfiles(profile.tmp)
+  output <- vpts_to_vp(read_vpts(profile.tmp))
 
   # read output and clean up
   if (vpfile != "") {
@@ -548,4 +403,12 @@ calculate_vp <- function(file, vpfile = "", pvolfile_out = "",
   output
 }
 
-format_file_for_shell <- function(x) sapply(x, function(file) system(paste("/bin/bash -c", shQuote(paste("printf %q", shQuote(normalizePath(file))))), intern = T),USE.NAMES=FALSE)
+format_reason_vol2bird <- function(x) {
+  on_intel_mac <- Sys.info()[["sysname"]]=="Darwin" & Sys.info()[["machine"]] == "x86_64"
+  if (.Platform$OS.type == "unix" & !on_intel_mac) {
+    return(paste(x, "Installation may require pre-installation of additional system libraries, see https://github.com/adokter/vol2birdR#install for instructions."))
+  } else {
+    # platform is Windows or Intel Mac, pre-compiled binaries are available on CRAN
+    return(x)
+  }
+}

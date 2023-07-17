@@ -37,7 +37,7 @@ sd_vvp_threshold.vp <- function(x) {
 #'
 #' @export
 sd_vvp_threshold.list <- function(x) {
-  vptest <- sapply(x, function(y) is(y, "vp"))
+  vptest <- sapply(x, function(y) methods::is(y, "vp"))
   if (FALSE %in% vptest) {
     stop("`x` must be list of `vp` objects.")
   }
@@ -64,6 +64,8 @@ sd_vvp_threshold.vpts <- function(x) {
 #' @inheritParams sd_vvp_threshold
 #' @param value Numeric. The `sd_vvp` threshold value to assign in m/s.
 #'
+#' @return The input object with updated density `x$data$dens` and `sd_vvp_thresh` attribute.
+#'
 #' @export
 #'
 #' @seealso
@@ -87,8 +89,8 @@ sd_vvp_threshold.vpts <- function(x) {
 #' @export
 `sd_vvp_threshold<-.vp` <- function(x, value) {
   stopifnot(inherits(x, "vp"))
-  assert_that(is.numeric(value))
-  assert_that(value >= 0)
+  assertthat::assert_that(is.numeric(value))
+  assertthat::assert_that(value >= 0)
   x$attributes$how$sd_vvp_thresh <- value
   if (is.numeric(x$attributes$how$rcs_bird)) {
     x$data$dens <- x$data$eta / x$attributes$how$rcs_bird
@@ -106,7 +108,7 @@ sd_vvp_threshold.vpts <- function(x) {
 #'
 #' @export
 `sd_vvp_threshold<-.list` <- function(x, value) {
-  vptest <- sapply(x, function(y) is(y, "vp"))
+  vptest <- sapply(x, function(y) methods::is(y, "vp"))
   if (FALSE %in% vptest) {
     stop("`x` must be list of `vp` objects.")
   }
@@ -120,8 +122,8 @@ sd_vvp_threshold.vpts <- function(x) {
 #' @export
 `sd_vvp_threshold<-.vpts` <- function(x, value) {
   stopifnot(inherits(x, "vpts"))
-  assert_that(is.numeric(value))
-  assert_that(value >= 0)
+  assertthat::assert_that(is.numeric(value))
+  assertthat::assert_that(value >= 0)
   x$attributes$how$sd_vvp_thresh <- value
   if (is.numeric(x$attributes$how$rcs_bird)) {
     x$data$dens <- x$data$eta / x$attributes$how$rcs_bird

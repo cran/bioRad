@@ -31,8 +31,7 @@
 #'   estimate (quantity `DBZH`).
 #' * `attributes`: List of the vertical profile's `what`, `where` and `how`
 #' attributes.
-#'
-#' @export
+#' @returns the value of a specific profile quantity specified in `quantity`.
 #'
 #' @seealso
 #' * [summary.vp()]
@@ -46,6 +45,7 @@
 #' # Extract the horizontal ground speed (ff) quantity from a vpts object and show the
 #' # first two datetimes
 #' get_quantity(example_vpts, "ff")[,1:2]
+#' @export
 get_quantity <- function(x, quantity) {
   UseMethod("get_quantity", x)
 }
@@ -59,7 +59,7 @@ get_quantity <- function(x, quantity) {
 get_quantity.vp <- function(x, quantity = "dens") {
   stopifnot(inherits(x, "vp"))
   available <- names(x$data)
-  assert_that(
+  assertthat::assert_that(
     quantity %in% available,
     msg = paste0("Can't find quantity `", quantity, "` in `x`.")
   )
@@ -88,7 +88,7 @@ get_quantity.vp <- function(x, quantity = "dens") {
 #' @return For a `list` object: a list of named (height bin) vectors with values
 #'   for the selected quantity.
 get_quantity.list <- function(x, quantity = "dens") {
-  vptest <- sapply(x, function(y) is(y, "vp"))
+  vptest <- sapply(x, function(y) methods::is(y, "vp"))
   if (FALSE %in% vptest) {
     stop("`x` must be list of `vp` objects.")
   }
@@ -104,7 +104,7 @@ get_quantity.list <- function(x, quantity = "dens") {
 get_quantity.vpts <- function(x, quantity = "dens") {
   ## this function should checkout both the gap and sd_vvp flags
   stopifnot(inherits(x, "vpts"))
-  assert_that(
+  assertthat::assert_that(
     quantity %in% c(names(x$data), "height"),
     msg = paste0("Can't find quantity `", quantity, "` in `x`.")
   )

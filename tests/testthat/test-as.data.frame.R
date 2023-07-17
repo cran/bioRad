@@ -3,47 +3,101 @@ vpts <- example_vpts
 
 # No tests for error on incorrect parameters:
 # as.data.frame() is generic and work for every input
-# TODO: test why parameter "optional" allows not_a_logical
 # TODO: test if "elev" parameter is passed correctly
 
 test_that("as.data.frame().vp returns error on incorrect parameters", {
-  expect_error(as.data.frame(vp, row.names = "not_a_logical"), "`row.names` must be a character vector of length")
-  # expect_error(as.data.frame(vp, optional = "not_a_logical"))
-  expect_error(as.data.frame(vp, geo = "not_a_logical"))
-  expect_error(as.data.frame(vp, suntime = "not_a_logical"))
-  expect_error(as.data.frame(vp, lat = "not_a_double"))
-  expect_error(as.data.frame(vp, lon = "not_a_double"))
-  expect_error(as.data.frame(vp, elev = "not_a_double"))
+  expect_error(
+    as.data.frame(vp, row.names = "not_a_logical"),
+    "`row.names` must be a character vector of length"
+  )
+  expect_error(
+    as.data.frame(vp, optional = "not_a_logical"),
+    regexp = "optional is not a flag (a length one logical vector).",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vp, geo = "not_a_logical"),
+    regexp = "geo is not a flag (a length one logical vector).",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vp, suntime = "not_a_logical"),
+    regexp = "suntime is not a flag (a length one logical vector).",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vp, lat = "not_a_double"),
+    regexp = "lat is not a numeric or integer vector",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vp, lon = "not_a_double"),
+    regexp = "lon is not a numeric or integer vector",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vp, elev = "not_a_double"),
+    regexp = "elev is not a numeric or integer vector",
+    fixed = TRUE
+  )
 
-  expect_error(as.data.frame(vpts, row.names = "not_a_vector"), "`row.names` must be a character vector of length")
-  # expect_error(as.data.frame(vpts, optional = "not_a_logical"))
-  expect_error(as.data.frame(vpts, geo = "not_a_logical"))
-  expect_error(as.data.frame(vpts, suntime = "not_a_logical"))
-  expect_error(as.data.frame(vpts, lat = "not_a_double"))
-  expect_error(as.data.frame(vpts, lon = "not_a_double"))
-  expect_error(as.data.frame(vpts, elev = "not_a_double"))
+  expect_error(as.data.frame(vpts, row.names = "not_a_vector"),
+    regexp = "`row.names` must be a character vector of length",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vpts, optional = "not_a_logical"),
+    regexp = "optional is not a flag (a length one logical vector).",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vpts, geo = "not_a_logical"),
+    regexp = "geo is not a flag (a length one logical vector).",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vpts, suntime = "not_a_logical"),
+    regexp = "suntime is not a flag (a length one logical vector).",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vpts, lat = "not_a_double"),
+    regexp = "lat is not a numeric or integer vector",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vpts, lon = "not_a_double"),
+    regexp = "lon is not a numeric or integer vector",
+    fixed = TRUE
+  )
+  expect_error(
+    as.data.frame(vpts, elev = "not_a_double"),
+    regexp = "elev is not a numeric or integer vector",
+    fixed = TRUE
+  )
 })
 
 test_that("as.data.frame() returns a data frame", {
-  expect_is(as.data.frame(vp), "data.frame")
-  expect_is(as.data.frame(vpts), "data.frame")
+  expect_s3_class(as.data.frame(vp), "data.frame")
+  expect_s3_class(as.data.frame(vpts), "data.frame")
 })
 
 test_that("as.data.frame() returns correct number of rows/cols", {
   vp_df <- as.data.frame(vp, geo = FALSE, suntime = FALSE)
   expect_equal(nrow(vp_df), 25) # 25 rows in nrow(vp$data)
-  expect_equal(ncol(vp_df), 18) # radar, datetime + 16 quantities
+  expect_equal(ncol(vp_df), 20) # radar, datetime + 18 quantities
 
   vpts_df <- as.data.frame(vpts, geo = FALSE, suntime = FALSE)
   expect_equal(nrow(vpts_df), 25 * 1934) # 25 rows * 1934 datetimes
-  expect_equal(ncol(vpts_df), 18) # radar, datetime + 16 quantities
+  expect_equal(ncol(vpts_df), 20) # radar, datetime + 18 quantities
 })
 
 test_that("as.data.frame() returns the expected column names", {
   expected_col_names <- c(
     "radar", "datetime", "ff", "dbz", "dens", "u", "v", "gap", "w", "n_dbz",
-    "dd", "n", "DBZH", "height", "n_dbz_all", "eta", "sd_vvp", "n_all", "lat",
-    "lon", "height_antenna", "day", "sunrise", "sunset"
+    "dd", "n", "DBZH", "height", "n_dbz_all", "eta", "sd_vvp", "n_all",
+    "rcs", "sd_vvp_threshold", "radar_latitude",
+    "radar_longitude", "radar_height", "radar_wavelength", "day", "sunrise", "sunset"
   )
   expect_equal(names(as.data.frame(vp)), expected_col_names)
   # expect_equal(names(as.data.frame(vpts)), expected_col_names) # See #382
@@ -77,14 +131,14 @@ test_that("as.data.frame() allows to assign row.names", {
 test_that("as.data.frame() includes lat/lon/height_antenna cols and can be assigned, unless geo = FALSE", {
   # lat/lon/height_antenna columns are added by default and taken from metadata
   vp_df <- as.data.frame(vp)
-  expect_equal(unique(vp_df[["lat"]]), vp$attributes$where$lat)
-  expect_equal(unique(vp_df[["lon"]]), vp$attributes$where$lon)
-  expect_equal(unique(vp_df[["height_antenna"]]), vp$attributes$where$height)
+  expect_equal(unique(vp_df[["radar_latitude"]]), vp$attributes$where$lat)
+  expect_equal(unique(vp_df[["radar_longitude"]]), vp$attributes$where$lon)
+  expect_equal(unique(vp_df[["radar_height"]]), vp$attributes$where$height)
 
   vpts_df <- as.data.frame(vpts)
-  expect_equal(unique(vpts_df[["lat"]]), vpts$attributes$where$lat)
-  expect_equal(unique(vpts_df[["lon"]]), vpts$attributes$where$lon)
-  expect_equal(unique(vpts_df[["height_antenna"]]), vpts$attributes$where$height)
+  expect_equal(unique(vpts_df[["radar_latitude"]]), vpts$attributes$where$lat)
+  expect_equal(unique(vpts_df[["radar_longitude"]]), vpts$attributes$where$lon)
+  expect_equal(unique(vpts_df[["radar_height"]]), vpts$attributes$where$height)
 
   # lat/lon/height_antenna columns are missing if geo = FALSE
   vp_df_geo_false <- as.data.frame(vp, geo = FALSE)
@@ -99,38 +153,37 @@ test_that("as.data.frame() includes lat/lon/height_antenna cols and can be assig
 
   # lat/lon can be set explicitly
   vp_df_latlong <- as.data.frame(vp, lat = 50.6, lon = 4.3)
-  expect_equal(unique(vp_df_latlong[["lat"]]), 50.6)
-  expect_equal(unique(vp_df_latlong[["lon"]]), 4.3)
+  expect_equal(unique(vp_df_latlong[["radar_latitude"]]), 50.6)
+  expect_equal(unique(vp_df_latlong[["radar_longitude"]]), 4.3)
 
   vpts_df_latlong <- as.data.frame(vpts, lat = 50.6, lon = 4.3)
-  expect_equal(unique(vpts_df_latlong[["lat"]]), 50.6)
-  expect_equal(unique(vpts_df_latlong[["lon"]]), 4.3)
+  expect_equal(unique(vpts_df_latlong[["radar_latitude"]]), 50.6)
+  expect_equal(unique(vpts_df_latlong[["radar_longitude"]]), 4.3)
 })
 
 test_that("as.data.frame() includes sunset/sunrise/day cols, unless suntime = FALSE", {
-    # sunset/sunrise/day columns are added by default
-    vp_df <- as.data.frame(vp)
-    expect_is(vp_df$sunset, "POSIXct")
-    expect_is(vp_df$sunrise, "POSIXct")
-    expect_is(vp_df$day, "logical")
+  # sunset/sunrise/day columns are added by default
+  vp_df <- as.data.frame(vp)
+  expect_s3_class(vp_df$sunset, "POSIXct")
+  expect_s3_class(vp_df$sunrise, "POSIXct")
+  expect_type(vp_df$day, "logical")
 
-    vpts_df <- as.data.frame(vpts)
-    expect_is(vpts_df$sunset, "POSIXct")
-    expect_is(vpts_df$sunrise, "POSIXct")
-    expect_is(vpts_df$day, "logical")
+  vpts_df <- as.data.frame(vpts)
+  expect_s3_class(vpts_df$sunset, "POSIXct")
+  expect_s3_class(vpts_df$sunrise, "POSIXct")
+  expect_type(vpts_df$day, "logical")
 
-    # sunset/sunrise/day columns are missing if suntime = FALSE
-    vp_df_suntime_false <- as.data.frame(vp, suntime = FALSE)
-    expect_null(vp_df_suntime_false$sunset)
-    expect_null(vp_df_suntime_false$sunrise)
-    expect_null(vp_df_suntime_false$day)
+  # sunset/sunrise/day columns are missing if suntime = FALSE
+  vp_df_suntime_false <- as.data.frame(vp, suntime = FALSE)
+  expect_null(vp_df_suntime_false$sunset)
+  expect_null(vp_df_suntime_false$sunrise)
+  expect_null(vp_df_suntime_false$day)
 
-    vpts_df_suntime_false <- as.data.frame(vpts, suntime = FALSE)
-    expect_null(vpts_df_suntime_false$sunset)
-    expect_null(vpts_df_suntime_false$sunrise)
-    expect_null(vpts_df_suntime_false$day)
-  }
-)
+  vpts_df_suntime_false <- as.data.frame(vpts, suntime = FALSE)
+  expect_null(vpts_df_suntime_false$sunset)
+  expect_null(vpts_df_suntime_false$sunrise)
+  expect_null(vpts_df_suntime_false$day)
+})
 
 test_that("as.data.frame.vp() values in sunrise/sunset/day cols are correct and updated with lat/lon", {
   # Only tested for vp (not vpts), which has timestamp 2015-10-18 18:00:00 UTC
@@ -141,9 +194,15 @@ test_that("as.data.frame.vp() values in sunrise/sunset/day cols are correct and 
   # Manual data check on: https://www.suncalc.org/#/56.3675,12.8517,12/2015.10.18/09:00/1/3
   expected_sunrise <- as.POSIXlt("2015-10-18 05:45:26", tz = "UTC") # 07:45:26 UTC+2
   expected_sunset <- as.POSIXlt("2015-10-18 16:01:13", tz = "UTC") # 18:01:13 UTC+2
-
-  expect_equal(as.POSIXlt(vp_df$sunrise[1]), expected_sunrise, tolerance = 5) # Tolerance: minutes
-  expect_equal(as.POSIXlt(vp_df$sunset[1]), expected_sunset, tolerance = 5)
+  ## Test that results are within 5 minutes of manual data check
+  expect_lt(
+    abs(lubridate::ymd_hms(vp_df$sunrise[1]) - lubridate::ymd_hms(expected_sunrise)),
+    lubridate::dminutes(5)
+  )
+  expect_lt(
+    abs(lubridate::ymd_hms(vp_df$sunset[1]) - lubridate::ymd_hms(expected_sunset)),
+    lubridate::dminutes(5)
+  )
   expect_false(vp_df$day[1]) # At the 18:00:00 UTC timestamp, it is night
 
   # 2. Set lat/lon to other values and check if it's still correct

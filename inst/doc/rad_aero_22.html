@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Adriaan M. Dokter" />
+
+
+<title>Introductory exercises with bioRad</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introductory exercises with bioRad</h1>
+<h4 class="author">Adriaan M. Dokter</h4>
+
+
+
+<p><em>These course materials were developed for the 4th Radar
+Aeroecology Training School, Jul 30 - Aug 5 2022, Fort Collins, CO,
+USA.</em></p>
+<div id="getting-started" class="section level1">
+<h1>Getting started</h1>
+<p>Execute each of the code examples provided below in <a href="https://posit.co/">RStudio</a>, and try to complete the
+exercises.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make sure you start with a fresh R session</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># load the bioRad package</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bioRad)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># check the package version</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">packageVersion</span>(<span class="st">&quot;bioRad&quot;</span>)</span></code></pre></div>
+<p>All bioRad’s functions are documented in an extensive <a href="https://adriaandokter.com/bioRad/dev/reference/index.html">function
+reference</a> online, as well as in manual pages within R:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># bring up the package general help page:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>?bioRad</span></code></pre></div>
+<p>Start by making a new directory on your local machine that you will
+use for this practical:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make a new local directory on your machine for this practical</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># replace the string below with the path of that directory:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>HOME <span class="ot">&lt;-</span> <span class="st">&quot;your/personal/working/directory/&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># check that the directory exists. If the next statement evaluates to FALSE, something went wrong: the directory does not exist or you didn&#39;t specify its path correctly</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(HOME)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># we will make HOME our work directory, the default folder in which R will look</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># for files, and where it will output newly generated files.</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(HOME)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># next, we will create two directories where we will be storing data:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">&quot;./data_vpts&quot;</span>) <span class="co"># here we will store vertical profile time series (vpts data)</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">&quot;./data_pvol&quot;</span>) <span class="co"># here we will store polar volumes (pvol data)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Finally, we set the local time zone to UTC, so all plotted time axes will be in UTC</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">TZ =</span> <span class="st">&quot;UTC&quot;</span>)</span></code></pre></div>
+<p>Next, download the two files posted in the <code>#biorad</code>
+channel, and put them in the newly created <code>data_vpts</code>
+folder</p>
+<p>Your R session is now properly set up.</p>
+</div>
+<div id="basic-visualization-of-radar-scans" class="section level1">
+<h1>Basic visualization of radar scans</h1>
+<div id="the-structure-of-polar-volumes" class="section level2">
+<h2>The structure of polar volumes</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Let&#39;s first download the NEXRAD polar volume files for the KHGX radar (Houston)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># for a 15 minute period in 2017:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">download_pvolfiles</span>(<span class="at">date_min=</span><span class="fu">as.POSIXct</span>(<span class="st">&quot;2017-05-04 01:25:00&quot;</span>), <span class="at">date_max=</span><span class="fu">as.POSIXct</span>(<span class="st">&quot;2017-05-04 01:40:00&quot;</span>), <span class="at">radar=</span><span class="st">&quot;KHGX&quot;</span>, <span class="at">directory=</span><span class="st">&quot;./data_pvol&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># store the filenames in my_pvolfiles</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>my_pvolfiles <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">&quot;./data_pvol&quot;</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern=</span><span class="st">&quot;KHGX&quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># print to console our files:</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>my_pvolfiles</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s load the first of our downloaded files:</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>my_pvol <span class="ot">&lt;-</span> <span class="fu">read_pvolfile</span>(my_pvolfiles[<span class="dv">1</span>])</span></code></pre></div>
+<p><strong>Exercise 1:</strong> What is the minimum and maximum scan
+elevation contained in the volume? And which scan parameters are
+available? (See manual page of the <code>read_pvolfile()</code> function
+for the nomenclature of various available quantities).</p>
+</div>
+<div id="plotting-radar-scans" class="section level2">
+<h2>Plotting radar scans</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s extract the scan collected at 1.5 degree elevation from our polar volume:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>my_scan <span class="ot">&lt;-</span> <span class="fu">get_scan</span>(my_pvol, <span class="fl">0.5</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print some information about this scan:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>my_scan</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s plot the reflectivity factor parameter of the scan in a range - azimuth coordinate system:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_scan, <span class="at">param =</span> <span class="st">&quot;DBZH&quot;</span>)</span></code></pre></div>
+<p>Usually it is easier to visually explore radar scans as a PPI (plan
+position indicator), which is a projection of the scan on a Cartesian
+(X,Y) or (lat,lon) grid:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># before we can plot the scan, we need to project it on a Cartesian grid,</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># i.e. we need to make a Plan Position Indicator (PPI)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>my_ppi <span class="ot">&lt;-</span> <span class="fu">project_as_ppi</span>(my_scan)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print some information about this ppi:</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>my_ppi</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># you can see we projected it on a 500 meter grid</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># (check the manual of the project_as_ppi function to see how you can</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># change the grid size (argument grid_size) and the maximum distance</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># from the radar up to where to plot data (argument range_max))</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Now we are ready to plot the ppi, for example let&#39;s plot reflectivity factor DBZH:</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_ppi, <span class="at">param =</span> <span class="st">&quot;DBZH&quot;</span>)</span></code></pre></div>
+<p><strong>Exercise 2:</strong> This case shows an incoming
+precipitation front, characterized by localized but intense
+thunderstorms, as well as biological scattering. Make also a ppi plot of
+the correlation coefficient (RHOHV) and radial velocity (VRADH). Verify
+which regions are precipitation, and the approximate direction of
+movement of biology and precipitation.</p>
+<p><strong>Exercise 3:</strong> Based on the radial velocity image, are
+the biological scatterers birds or insects? Why?</p>
+</div>
+<div id="overlaying-radar-scans-on-maps" class="section level2">
+<h2>Overlaying radar scans on maps</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># It is often informative to plot radar data on a base layer.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># first download the background image:</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>basemap <span class="ot">&lt;-</span> <span class="fu">download_basemap</span>(my_ppi)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the basemap:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(basemap)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># then overlay the PPI on the basemap, restricting the color scale from -20 to 40 dBZ:</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(my_ppi, <span class="at">map =</span> basemap, <span class="at">param =</span> <span class="st">&quot;DBZH&quot;</span>, <span class="at">zlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">20</span>, <span class="dv">40</span>))</span></code></pre></div>
+</div>
+</div>
+<div id="screening-out-weather" class="section level1">
+<h1>Screening out weather</h1>
+<div id="using-correlation-coefficient" class="section level2">
+<h2>using correlation coefficient</h2>
+<p>Screening precipitation based on correlation coefficient is arguably
+the most simple and established approach for screening out weather in
+cases where dual-polarization data is available. It is based on removing
+data above a certain <span class="math inline">\(\rho_{/HV}\)</span>
+thresholds, most commonly 0.95.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Screen out the reflectivity areas with RHOHV &lt; 0.95</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>my_ppi_clean <span class="ot">&lt;-</span> <span class="fu">calculate_param</span>(my_ppi, <span class="at">DBZH =</span> <span class="fu">ifelse</span>(RHOHV <span class="sc">&gt;</span> <span class="fl">0.95</span>, <span class="cn">NA</span>, DBZH))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the original and cleaned up reflectivity:</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(my_ppi, <span class="at">map =</span> basemap, <span class="at">param =</span> <span class="st">&quot;DBZH&quot;</span>, <span class="at">zlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">20</span>, <span class="dv">40</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(my_ppi_clean, <span class="at">map =</span> basemap, <span class="at">param =</span> <span class="st">&quot;DBZH&quot;</span>, <span class="at">zlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">20</span>, <span class="dv">40</span>))</span></code></pre></div>
+</div>
+<div id="using-mistnet" class="section level2">
+<h2>using MistNet</h2>
+<p>You can use MistNet for screening out weather when * the radar
+operates at S-band wavelengths * you only have single polarization data
+available (specifically, the three basic quantities radial velocity
+VRADH, reflectivity DBZH, and spectrum width WRADH).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># apply the MistNet model to the polar volume file and load it as a polar volume (pvol):</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>my_pvol <span class="ot">&lt;-</span> <span class="fu">apply_mistnet</span>(my_pvolfiles[<span class="dv">1</span>])</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># mistnet will add additional parameters to the</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># elevation scans at 0.5, 1.5, 2.5, 3.5 and 4.5 degrees</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s extract the scan closest to 0.5 degrees:</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>my_scan <span class="ot">&lt;-</span> <span class="fu">get_scan</span>(my_pvol, <span class="fl">0.5</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plot some summary info about the scan to the console:</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>my_scan</span></code></pre></div>
+</div>
+<div id="using-depolarization-ratio" class="section level2">
+<h2>using depolarization ratio</h2>
+<p>Another quantity that has been proposed for distinguishing weather
+and biology is the depolarization ratio (<span class="math inline">\(D_r\)</span>), which is defined as</p>
+<p><span class="math display">\[D_r=\frac{Z_{DR}+ 1 -2 \sqrt{Z_{DR}} \
+\rho_{HV}}{Z_{DR}+ 1 +2 \sqrt{Z_{DR}} \ \rho_{HV}}\]</span> First we add
+the depolarization ratio (DR) as a parameter. We’ll express DR on a dB
+scale by transforming: <span class="math display">\[DR=10\log_{10}(D_r)
+\]</span> (see <em>Kilambi et al. 2018, A Simple and Effective Method
+for Separating Meteorological from Nonmeteorological Targets Using
+Dual-Polarization Data</em> for more information)</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s add depolarization ratio (DR) as a parameter (following Kilambi 2018):</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>my_ppi <span class="ot">&lt;-</span> <span class="fu">calculate_param</span>(my_ppi, <span class="at">DR =</span> <span class="dv">10</span> <span class="sc">*</span> <span class="fu">log10</span>((<span class="dv">1</span><span class="sc">+</span> ZDR <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> (ZDR<span class="sc">^</span><span class="fl">0.5</span>) <span class="sc">*</span> RHOHV) <span class="sc">/</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">1</span> <span class="sc">+</span> ZDR<span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> (ZDR<span class="sc">^</span><span class="fl">0.5</span>) <span class="sc">*</span> RHOHV)))</span></code></pre></div>
+<p>Like correlation coefficient you can apply simple thresholds to its
+value to screen out precipitation. It has a good (potentially even
+better) ability to distinguish weather and biology:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="co"># plot the depolarization ratio, using a viridis color palette:</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(my_ppi, <span class="at">map =</span> basemap, <span class="at">param =</span> <span class="st">&quot;DR&quot;</span>, <span class="at">zlim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">25</span>,<span class="sc">-</span><span class="dv">5</span>), <span class="at">palette =</span> viridis<span class="sc">::</span><span class="fu">viridis</span>(<span class="dv">100</span>))</span></code></pre></div>
+<p>MistNet adds several new parameters: * <code>WEATHER</code>: a
+probability (0-1) for the weather class * <code>BIOLOGY</code>: a
+probability (0-1) for the biology class * <code>BACKGROUND</code>: a
+probability (0-1) for the background (empty space) class *
+<code>CELL</code>: the final segmentation, which is based on the WEATHER
+parameters of all five MistNet elevation scans. <code>CELL</code> also
+includes a fringe calculated by a region growing approach.
+<code>CELL</code> values equal 1 for the additional fringe, and 2 for
+the originally segmented precipitation area by MistNet.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># as before, project the scan as a ppi:</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>my_ppi <span class="ot">&lt;-</span> <span class="fu">project_as_ppi</span>(my_scan)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the probability for the WEATHER class</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_ppi, <span class="at">param =</span> <span class="st">&#39;WEATHER&#39;</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the final segmentation result:</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the probability for the WEATHER class</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_ppi, <span class="at">param =</span> <span class="st">&#39;CELL&#39;</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s remove the identified precipitation area (and additional fringe) from the ppi, and plot it:</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>my_ppi_clean <span class="ot">&lt;-</span> <span class="fu">calculate_param</span>(my_ppi, <span class="at">DBZH =</span> <span class="fu">ifelse</span>(CELL <span class="sc">&gt;=</span> <span class="dv">1</span>, <span class="cn">NA</span>, DBZH))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(my_ppi_clean, <span class="at">map=</span>basemap, <span class="at">param =</span> <span class="st">&#39;DBZH&#39;</span>)</span></code></pre></div>
+<p><strong>Exercise 4:</strong> Calculate and plot a ‘cleaned up’ PPI
+for the radial velocity that includes only the segmentation by MistNet
+and not the additional fringe.</p>
+</div>
+</div>
+<div id="vertical-profiles" class="section level1">
+<h1>Vertical profiles</h1>
+<p>In this section you will learn to compute, interpret and analyze
+vertical profiles (vp). A vp consists of the (bird) density, speed and
+directions at different altitudes at the location of a single radar. It
+is typically calculated for all data within a cylinder of 35 km radius
+around the radar, i.e. only containing data at relatively short
+distances, where the radar beam is still sufficiently narrow to resolve
+altitude information.</p>
+<p>Section 3 has examples that show how to process polar volume data
+into vertical profiles. To save time, we will start below with a list of
+pre-processed vertical profiles for the Brownsville radar in Texas
+(KBRO).</p>
+<div id="loading-processed-vertical-profiles" class="section level2">
+<h2>Loading processed vertical profiles</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Usually we would load processed vertical profiles (vp files) by:</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># my_vplist &lt;- read_vpfiles(&quot;./your/directory/with/processed/profiles/goes/here&quot;)</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># my_vplist contains after running the command a list of vertical profile (vp) objects</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To save time, we load these data directly from file</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>my_vplist <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data_vpts/KBRO20170514.rds&quot;</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># print the length of the vplist object. It should contain 95 profiles</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(my_vplist)</span></code></pre></div>
+</div>
+<div id="inspecting-single-vertical-profiles" class="section level2">
+<h2>Inspecting single vertical profiles</h2>
+<p>Now that you have loaded a list of vertical profiles, we can start
+exploring them. We will start with plotting and inspecting single
+vertical profiles, i.e. a single profile from the list of vp objects you
+have just loaded.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s extract a profile from the list, in this example the 41st profile:</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>my_vp <span class="ot">&lt;-</span> my_vplist[[<span class="dv">41</span>]]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print some info for this profile to the console</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>my_vp</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># test whether this profile was collected at day time:</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">check_night</span>(my_vp)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the vertical profile, in terms of reflectivity factor</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vp, <span class="at">quantity =</span> <span class="st">&quot;dbz&quot;</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the vertical profile, in terms of (linear) reflectivity</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vp, <span class="at">quantity =</span> <span class="st">&quot;eta&quot;</span>)</span></code></pre></div>
+<p><code>eta</code> and <code>dbz</code> are closely related, the main
+difference is that reflectivity factors are logarithmic, and
+reflectivities linear. You can convert one into the other using
+<code>eta_to_dbz()</code> and <code>dbz_to_eta()</code> functions, which
+follows this simple formula:</p>
+<pre><code>eta = (radar-wavelength dependent constant) * 10^(dbz/10)</code></pre>
+<p>The reflectivity factor <code>dBZ</code> is the quantity used by most
+meteorologist. It has the useful property that at different radar
+wavelengths (e.g. S-band versus C-band) the same amount of precipitation
+shows up at similar reflectivity factors. The same holds for insects, as
+well as any other target that is much smaller than the radar wavelength
+(S-band = 10 cm, C-band = 5 cm), the so-called Rayleigh-scattering
+limit.</p>
+<p>In the case of birds we are outside the Rayleigh limit, because birds
+are of similar size as the radar wavelength. In this limit reflectivity
+<code>eta</code> is more similar between S-band and C-band.
+<code>eta</code> is also more directly related to the density of birds,
+since <code>eta</code> can be expressed as (bird density) x (radar cross
+section per bird). For these two reasons, for weather radar
+ornithologists reflectivity <code>eta</code> is the more conventional
+unit.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s plot the vertical profile, in terms of bird density</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vp, <span class="at">quantity =</span> <span class="st">&quot;dens&quot;</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print the currently assumed radar cross section (RCS) per bird:</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rcs</span>(my_vp)</span></code></pre></div>
+<p><strong>Exercise 5:</strong> If you change your assumption on the
+bird’s radar cross section in the previous example, and assume the RCS
+is 10 times as large, what will be the effect on the bird density
+profile?</p>
+<p>The assumed radar cross section can be changed as follows:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s change the RCS to 110 cm^2</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rcs</span>(my_vp) <span class="ot">&lt;-</span> <span class="dv">110</span></span></code></pre></div>
+<p><strong>Exercise 6:</strong> Verify your answers on the previous two
+questions, by re-plotting the vertical profiles for the bird density
+quantity.</p>
+</div>
+<div id="plotting-vertical-profile-time-series" class="section level2">
+<h2>Plotting vertical profile time series</h2>
+<p>We will now examine multiple vertical profiles at once that are
+ordered into a time series, e.g. the vertical profiles obtained from a
+single radar over a full day.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># convert the list of vertical profiles into a time series:</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>my_vpts <span class="ot">&lt;-</span> <span class="fu">bind_into_vpts</span>(my_vplist)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># time series objects can be subsetted, just as you may be used to with vectors</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># here we subset the first 50 timesteps:</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>my_vpts[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># here we extract a single timestep, which gives you back a vertical profile class object:</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>my_vpts[<span class="dv">100</span>]</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># to plot the full time series:</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpts)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># check the help file for the plotting function of profile time series</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Because profile timeseries are of class &#39;vpts&#39;, it&#39;s associated plotting function</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co"># is called plot.vpts:</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>?plot.vpts</span></code></pre></div>
+<p>Let’s make a plot for a subselection of the time series:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter our vpts for night time</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>my_vpts_night <span class="ot">&lt;-</span> <span class="fu">filter_vpts</span>(my_vpts, <span class="at">night=</span><span class="cn">TRUE</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plot this smaller time series:</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpts_night)</span></code></pre></div>
+<p><strong>Exercise 7:</strong> Interpret the wind barbs in the profile
+time series figure: what is the approximate speed and direction at 1500
+meter at 6 UTC? In the speed barbs, each half flag represents 2.5 m/s,
+each full flag 5 m/s, [each pennant (triangle) 25 m/s, not occurring in
+this case].</p>
+<p><strong>Exercise 8:</strong> Extract the vertical profile at 6 UTC
+from the time series and plot the vertical profile of ground speed
+(quantity <code>ff</code>). Hint: use function
+<code>filter_vpts()</code> to extract the 6 UTC profile. Check whether
+your answer to the previous question was approximately correct.</p>
+</div>
+<div id="vertical-and-time-integration-of-profiles" class="section level2">
+<h2>Vertical and time integration of profiles</h2>
+<p>Often you will want to sum together all the migrants in the vertical
+dimension, for example if you want a single index of how many birds are
+migrating at a certain instant. There are at least two ways in which you
+can do that:</p>
+<ul>
+<li>by calculating the vertically integrated bird density (VID), which
+is <em>surface</em> density as opposed to a <em>volume</em> densities
+you have been plotting in the previous exercises: this number gives you
+how many migrants are aloft per square kilometer earth’s surface (unit
+individuals/km<span class="math inline">\(^{2}\)</span>), obtained by a
+vertical integration of the volume densities (unit individuals/km<span class="math inline">\(^{3}\)</span>).</li>
+<li>Note that the VID quantity doesn’t depend on the speed of the
+migrants. A common measure that reflects both the density and speed of
+the migration is migration traffic rate (MTR). This is flux measure that
+gives you how many migrants are passing the radar station per unit of
+time and per unit of distance perpendicular to the migratory direction
+(unit individuals/km/hour).</li>
+</ul>
+<p>We will be using bioRad’s <code>integrate_profile()</code> function
+to calculate these quantities:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Let&#39;s continue with the vpts object created in the previous example.</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The vertically integrated quantities are calculated as follows:</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>my_vpi <span class="ot">&lt;-</span> <span class="fu">integrate_profile</span>(my_vpts)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># The my_vpi object you created is a vpi class object, which is an acronym for &quot;vertical profile integrated&quot;. It has its own plot method, which by default plots migration traffic rate (MTR):</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpi)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># you can also plot vertically integrated densities (VID):</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpi, <span class="at">quantity =</span> <span class="st">&quot;vid&quot;</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># the gray and white shading indicates day and night, which is calculated</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># from the date and the radar position. You can also turn this off:</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpi, <span class="at">night_shade =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the cumulative number of birds passing the radar, i.e. migration traffic (mt):</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpi, <span class="at">quantity =</span> <span class="st">&quot;mt&quot;</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># execute `?plot.vpi` to open the help page listing all the options.</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>?plot.vpi</span></code></pre></div>
+<p>The following questions only require pen and paper. Assume a night
+migration event in which the volume density of birds from 0-1 km above
+ground is 200 birds per cubic kilometer, and from 1-1.5 km 100 birds per
+cubic kilometer. Above 1500 meter there are no birds.</p>
+<p><strong>Exercise 9:</strong> What is in this case the bird’s
+vertically integrated density (VID)? Give your answer in units
+birds/km<span class="math inline">\(^2\)</span>.</p>
+<p><strong>Exercise 10:</strong> Let’s assume that in the lower layer
+birds fly at 50 km/hour, and in the upper layer at 100 km/hour. What is
+in this case the migration traffic rate across a transect perpendicular
+to the direction of movement? Give your answer in units
+birds/km/hour.</p>
+<p><strong>Exercise 11:</strong>Let’s assume migration continued for
+exactly three hours after sunset, and then halted abruptly. How many
+birds have passed a 10 km transect perpendicular to the direction of
+movement in this night? Give your answer in terms of migration traffic
+(mt) in units birds/km.</p>
+<p>Both MTR, VID and MT depend on the assumed radar cross section (RCS)
+per bird. If you are unwilling/unable to specify RCS, alternatively you
+can use two closely related quantities that make no assumptions RCS:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># instead of vertically integrated density (VID), you can use vertically integrated reflectivity (VIR):</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpi, <span class="at">quantity =</span> <span class="st">&quot;vir&quot;</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># instead of migration traffic rate (MTR), you can use the reflectivity traffic rate (RTR):</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpi, <span class="at">quantity =</span> <span class="st">&quot;rtr&quot;</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># instead of migration traffic (MT), you can use the reflectivity traffic (RT):</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpi, <span class="at">quantity =</span> <span class="st">&quot;rt&quot;</span>)</span></code></pre></div>
+<p>VIR gives you the total cross-sectional area of air-borne targets per
+square kilometer of ground surface, whereas RTR gives you the total
+cross-sectional area of targets flying across a one kilometer line
+perpendicular to the migratory flow per hour.</p>
+</div>
+<div id="inspecting-precipitation-signals-in-profiles" class="section level2">
+<h2>Inspecting precipitation signals in profiles</h2>
+<p>Precipitation is known to have a major influence on the timing and
+intensity of migration, therefore it is a useful skill to be able to
+inspect profiles for presence of precipitation.</p>
+<p>Also, although automated bird quantification algorithms become more
+and more reliable, distinguishing precipitation from birds remains
+challenging for algorithms in specific cases. It is therefore important
+to have the skills to inspect suspicious profiles. That may help you to
+identify potential errors of the automated methods, and prevent your
+from overinterpreting the data.</p>
+<p>An easy way of doing that is plotting the vertical profile of total
+reflectivity (quantity DBZH), which includes everything: birds, insects
+and precipitation. Precipitation often has higher reflectivities than
+birds, and also extends to much higher altitudes.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load a time series for the KBGM radar in Binghamton, NY</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>my_vpts <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data_vpts/KBGM20170527-20170602.rds&quot;</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print the loaded vpts time series for this radar:</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>my_vpts</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the bird density over time:</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpts, <span class="at">quantity =</span> <span class="st">&quot;dens&quot;</span>)</span></code></pre></div>
+<p><strong>Exercise 12:</strong> Compare the above plot for bird density
+(quantity <code>dens</code>) with a profile plot for total reflectivity
+(quantity <code>DBZH</code>, showing birds and precipitation combined).
+Compare the two plots to visually identify periods and altitude layers
+with precipitation.</p>
+</div>
+</div>
+<div id="range-bias-correction" class="section level1">
+<h1>Range bias correction</h1>
+<p>In the previous section we have explored vertical integration of
+vertical profiles (<code>vp</code>’s). In this paragraph we will
+generalize vertical integration to entire radar images
+(<code>ppi</code>’s). To do that properly, we will account for the
+changing beam shape of the radar with range.</p>
+<p>First, let’s examine the beam shape of the lowest elevation scan of
+the radar, which is typically around 0.5 degrees.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define ranges from 0 to 2500000 meter (250 km), in steps of 100 m:</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>range <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">250000</span>, <span class="dv">100</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the beam height of the 0.5 degree elevation beam:</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(range, <span class="fu">beam_height</span>(range, <span class="fl">0.5</span>), <span class="at">ylab =</span> <span class="st">&quot;beam height [m]&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;range [m]&quot;</span>, <span class="at">type=</span><span class="st">&#39;l&#39;</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s add the lower and upper altitude of the beam, as determined by the beam width:</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(range, <span class="fu">beam_height</span>(range, <span class="fl">0.5</span>)<span class="sc">-</span><span class="fu">beam_width</span>(range)<span class="sc">/</span><span class="dv">2</span>, <span class="at">type=</span><span class="st">&#39;l&#39;</span>,<span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(range, <span class="fu">beam_height</span>(range, <span class="fl">0.5</span>)<span class="sc">+</span><span class="fu">beam_width</span>(range)<span class="sc">/</span><span class="dv">2</span>, <span class="at">type=</span><span class="st">&#39;l&#39;</span>,<span class="at">lty=</span><span class="dv">3</span>)</span></code></pre></div>
+<p>We will start with downloading a polar volume and processing it into
+a profile:</p>
+<div id="processing-a-polar-volume-into-a-profile" class="section level2">
+<h2>Processing a polar volume into a profile</h2>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># download a polar volume for the KBRO radar in Brownsville, TX</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">download_pvolfiles</span>(<span class="at">date_min=</span><span class="fu">as.POSIXct</span>(<span class="st">&quot;2017-05-14 05:50:00&quot;</span>), <span class="at">date_max=</span><span class="fu">as.POSIXct</span>(<span class="st">&quot;2017-05-14 06:00:00&quot;</span>), <span class="at">radar=</span><span class="st">&quot;KBRO&quot;</span>, <span class="at">directory=</span><span class="st">&quot;./data_pvol&quot;</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load all the polar volume filenames downloaded so far for the KBRO radar:</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>my_pvolfiles <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">&quot;./data_pvol&quot;</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern=</span><span class="st">&quot;KBRO&quot;</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># we will process the first one into a vp:</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>my_pvolfile <span class="ot">&lt;-</span> my_pvolfiles[<span class="dv">1</span>]</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate the profile, using MistNet to remove precipitation:</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># we calculate 60 layers of 50 meter width, so up to 30*100=3000 m.</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>my_vp <span class="ot">&lt;-</span> <span class="fu">calculate_vp</span>(my_pvolfile, <span class="at">n_layer=</span><span class="dv">60</span>, <span class="at">h_layer=</span><span class="dv">50</span>, <span class="at">sd_vvp_threshold =</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><strong>Exercise 13:</strong> Plot the bird density in the vertical
+profile you just estimated and compare it with the plots above of the
+beam height and width of the lowest radar beam. At which approximate
+range do you expect the radar will no longer be able to resolve the
+altitude distribution of the migratory birds. And at which range will
+the radar start to overshoot the migration layer entirely?</p>
+<p>To correct for the decreasing ability of the radar to resolve the
+altitude distributions of birds with range, we will make one important
+(and likely imperfect!) assumption:</p>
+<p><strong>We assume that all birds within the image are distributed
+vertically according to the same relative vertical profile.</strong></p>
+<p>This assumptions simplifies the problem, and allows us to estimate
+the spatial distribution of the birds, as we will explore in the next
+paragraph:</p>
+</div>
+<div id="range-bias-correction-and-vertical-integration-on-a-map" class="section level2">
+<h2>Range bias correction and vertical integration on a map</h2>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We will use the piping operator %&gt;% of magrittr package to</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># execute multiple operations in one statement:</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># first, load the polar volume:</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>my_pvolfile <span class="sc">%&gt;%</span> <span class="fu">read_pvolfile</span>() <span class="ot">-&gt;</span> my_pvol</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Next, let&#39;s calculate a PPI for the 1.5 degree elevation scan</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Finally, we calculated the vertically integrated PPI</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>my_ppi_integrated <span class="ot">&lt;-</span> <span class="fu">integrate_to_ppi</span>(<span class="at">pvol=</span>my_pvol,<span class="at">vp=</span>my_vp, <span class="at">res=</span><span class="dv">1000</span>)</span></code></pre></div>
+<p><strong>Exercise 14:</strong> Visually compare the PPI for the 1.0
+degree sweep and the vertically integrated PPI, and explain the
+difference in spatial pattern. (For the clearest comparison, make plots
+of comparable parameters that are either linear or logarithmic in bird
+density).</p>
+</div>
+</div>
+<div id="processing-many-polar-volumes" class="section level1">
+<h1>Processing many polar volumes</h1>
+<div id="accessing-radar-data" class="section level2">
+<h2>Accessing radar data</h2>
+<ul>
+<li>US NEXRAD polar volume data can be accessed in the <a href="https://s3.amazonaws.com/noaa-nexrad-level2/index.html">Amazon
+cloud</a>. Use function <code>download_pvolfiles()</code> for local
+downloads</li>
+<li>European radar data can be accessed at <a href="https://aloftdata.eu" class="uri">https://aloftdata.eu</a>. These
+are processed vertical profiles, the full polar volume data are not
+openly available for most countries. Use function
+<code>download_vpfiles()</code> for local downloads.</li>
+</ul>
+<p>The names of the radars in the networks can be found here:</p>
+<ul>
+<li>US: <a href="https://www.roc.noaa.gov/WSR88D/Maps.aspx">NEXRAD
+network</a></li>
+<li>Europe: <a href="http://eumetnet.eu/wp-content/themes/aeron-child/observations-programme/current-activities/opera/database/OPERA_Database/index.html">OPERA
+database</a></li>
+</ul>
+<p>Useful sites for inspecting pre-made movies of the US composite are
+<a href="https://birdcast.info/migration-tools/live-migration-maps/" class="uri">https://birdcast.info/migration-tools/live-migration-maps/</a>
+and <a href="https://www.pauljhurtado.com/US_Composite_Radar/" class="uri">https://www.pauljhurtado.com/US_Composite_Radar/</a>.</p>
+</div>
+<div id="processing-multiple-polar-volumes" class="section level2">
+<h2>Processing multiple polar volumes</h2>
+<p>This section contains an example for processing a directory of polar
+volumes into profiles:</p>
+<p>First we download more files, and prepare an output directory for
+storing the processed profiles:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First we download more data, for a total of one additional hour for the same radar:</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">download_pvolfiles</span>(<span class="at">date_min=</span><span class="fu">as.POSIXct</span>(<span class="st">&quot;2017-05-04 01:40:00&quot;</span>), <span class="at">date_max=</span><span class="fu">as.POSIXct</span>(<span class="st">&quot;2017-05-04 02:40:00&quot;</span>), <span class="at">radar=</span><span class="st">&quot;KHGX&quot;</span>, <span class="at">directory=</span><span class="st">&quot;./data_pvol&quot;</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co"># We will process all the polar volume files downloaded so far:</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>my_pvolfiles <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">&quot;./data_pvol&quot;</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern=</span><span class="st">&quot;KHGX&quot;</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>my_pvolfiles</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co"># create output directory for processed profiles</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>outputdir <span class="ot">&lt;-</span> <span class="st">&quot;./data_vp&quot;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(outputdir)</span></code></pre></div>
+<p>We will use the following custom settings for processing: * We will
+use MistNet to screen out precipitation * we will calculate profile
+layers of 50 meter width * we will calculate 60 profile layers, so up to
+50*60=3000 meter altitude</p>
+<p>Note that we enclose the <code>calculate_vp()</code> function in
+<code>tryCatch()</code> to keep going after errors with specific
+files</p>
+<p>Having generated the profiles, we can read them into R:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we assume outputdir contains the path to the directory with processed profiles</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>my_vpfiles <span class="ot">&lt;-</span> <span class="fu">list.files</span>(outputdir, <span class="at">full.names =</span> <span class="cn">TRUE</span>, <span class="at">pattern=</span><span class="st">&quot;KHGX&quot;</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print them</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>my_vpfiles</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co"># read them</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>my_vplist <span class="ot">&lt;-</span> <span class="fu">read_vpfiles</span>(my_vpfiles)</span></code></pre></div>
+<p>You can now continue with visualizing and post-processing as we did
+earlier:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make a time series of profiles:</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>my_vpts <span class="ot">&lt;-</span> <span class="fu">bind_into_vpts</span>(my_vplist)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plot them between 0 - 3 km altitude:</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpts, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3000</span>))</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># because of the rain moving in, our ability to estimate bird profiles slowly drops:</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s visualize rain by plotting all aerial reflectivity:</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(my_vpts, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3000</span>), <span class="at">quantity=</span><span class="st">&quot;DBZH&quot;</span>)</span></code></pre></div>
+<p>Note that we enclose the <code>calculate_vp()</code> function in
+<code>tryCatch()</code> to keep going after errors with specific
+files</p>
+</div>
+<div id="parallel-processing" class="section level2">
+<h2>Parallel processing</h2>
+<p>We may use one of the parallelization packages in R to further speed
+up our processing. We will use <code>mclapply()</code> from package
+<code>parallel</code>. First we wrap up the processing statements in a
+function, so we can make a single call to a single file. We will disable
+MistNet, as this deep-learning model does not parallelize well on a cpu
+machine.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>process_file <span class="ot">&lt;-</span> <span class="cf">function</span>(file_in){</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># construct output filename from input filename</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  file_out <span class="ot">&lt;-</span> <span class="fu">paste</span>(outputdir, <span class="st">&quot;/&quot;</span>, <span class="fu">basename</span>(file_in), <span class="st">&quot;_vp.h5&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># run calculate_vp()</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  vp <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(<span class="fu">calculate_vp</span>(file_in, file_out, <span class="at">mistnet =</span> <span class="cn">FALSE</span>, <span class="at">h_layer=</span><span class="dv">50</span>, <span class="at">n_layer=</span><span class="dv">60</span>), <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">is.vp</span>(vp)){</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># return TRUE if we calculated a profile</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span>{</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># return FALSE if we did not</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">FALSE</span>)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="co"># To process a file, we can now run</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="fu">process_file</span>(my_pvolfiles[<span class="dv">1</span>])</span></code></pre></div>
+<p>Next, we use <code>mclapply()</code> to do the parallel processing
+for all files:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load the parallel library</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(parallel)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co"># detect how many cores we can use. We will keep 2 cores for other tasks and use the rest for processing.</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>number_of_cores <span class="ot">=</span> <span class="fu">detectCores</span>() <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Available cores:</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>number_of_cores</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co"># let&#39;s loop over the files and generate profiles</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>start<span class="ot">=</span><span class="fu">Sys.time</span>()</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="fu">mclapply</span>(my_pvolfiles, process_file, <span class="at">mc.cores =</span> number_of_cores)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>end<span class="ot">=</span><span class="fu">Sys.time</span>()</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate the processing time that has passed:</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>end<span class="sc">-</span>start</span></code></pre></div>
+</div>
+</div>
+<div id="further-analysis-outside-biorad" class="section level1">
+<h1>Further analysis outside bioRad</h1>
+<p>In many cases you will want to convert bioRad’s objects into a
+convenient form for your own further analyses. To convert bioRad objects
+to a simple <code>data.frame</code>:</p>
+<ul>
+<li>vertical profile (<code>vp</code>):
+as.data.frame(<code>your_vp_object</code>)</li>
+<li>vertical profile time series (<code>vpts</code>):
+as.data.frame(<code>your_vpts_object</code>)</li>
+<li>integrated vertical profile time series (<code>vpi</code>): is
+already a <code>data.frame</code></li>
+</ul>
+<p>Converting polar scans (<code>scan</code> objects) to common spatial
+formats:</p>
+<ul>
+<li>use <code>scan_to_raster()</code> to convert to a
+<code>RasterBrick</code> object (package raster)</li>
+<li>use <code>scan_to_spatial()</code> to convert to a
+<code>SpatialPointsDataFrame</code> object (package sp)</li>
+</ul>
+<p>Converting PPI (<code>ppi</code> objects) to common spatial formats:
+* access the data slot (<code>my_ppi$data</code>) to extract a
+<code>SpatialGridDataFrame</code> object (package sp)</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

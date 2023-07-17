@@ -66,7 +66,12 @@
 as.data.frame.vp <- function(x, row.names = NULL, optional = FALSE, geo = TRUE,
                              suntime = TRUE, lat = NULL, lon = NULL,
                              elev = -0.268, ...) {
+  # check input parameters
   stopifnot(inherits(x, "vp"))
+  assertthat::assert_that(assertthat::is.flag(optional))
+  assertthat::assert_that(assertthat::is.flag(geo))
+  assertthat::assert_that(assertthat::is.flag(suntime))
+  # fetch lat and long if missing
   if (is.null(lat)) {
     lat <- x$attributes$where$lat
   }
@@ -81,7 +86,7 @@ as.data.frame.vp <- function(x, row.names = NULL, optional = FALSE, geo = TRUE,
       length(x$data$height)) {
       rownames(output) <- row.names
     } else {
-      stop(glue(
+      stop(glue::glue(
         "`row.names` must be a character vector of length ",
         "{length(x$data$height)}."
       ))
@@ -92,11 +97,15 @@ as.data.frame.vp <- function(x, row.names = NULL, optional = FALSE, geo = TRUE,
   output$height <- NULL
   # add radar name
   output <- cbind(radar = x$radar, output, stringsAsFactors = FALSE)
+  # add essential attributes
+  output$rcs <- x$attributes$how$rcs_bird
+  output$sd_vvp_threshold <- x$attributes$how$sd_vvp_thresh
   # add location information
   if (geo) {
-    output$lat <- lat
-    output$lon <- lon
-    output$height_antenna <- x$attributes$where$height
+    output$radar_latitude <- lat
+    output$radar_longitude <- lon
+    output$radar_height <- x$attributes$where$height
+    output$radar_wavelength <- x$attributes$how$wavelength
   }
   # override the lat, lon attributes in case of user-provided values
   x$attributes$where$lat <- lat
@@ -126,7 +135,13 @@ as.data.frame.vp <- function(x, row.names = NULL, optional = FALSE, geo = TRUE,
 as.data.frame.vpts <- function(x, row.names = NULL, optional = FALSE,
                                geo = TRUE, suntime = TRUE, lat = NULL,
                                lon = NULL, elev = -0.268, ...) {
+
+  # check input parameters
   stopifnot(inherits(x, "vpts"))
+  assertthat::assert_that(assertthat::is.flag(optional))
+  assertthat::assert_that(assertthat::is.flag(geo))
+  assertthat::assert_that(assertthat::is.flag(suntime))
+  # fetch lat and long if missing
   if (is.null(lat)) {
     lat <- x$attributes$where$lat
   }
@@ -141,7 +156,7 @@ as.data.frame.vpts <- function(x, row.names = NULL, optional = FALSE,
       length(x$datetime) * length(x$height)) {
       rownames(output) <- row.names
     } else {
-      stop(glue(
+      stop(glue::glue(
         "`row.names` must be a character vector of length ",
         "{length(x$datetime) * length(x$height)}."
       ))
@@ -157,11 +172,15 @@ as.data.frame.vpts <- function(x, row.names = NULL, optional = FALSE,
   )
   # add radar name
   output <- cbind(radar = x$radar, output, stringsAsFactors = FALSE)
+  # add essential attributes
+  output$rcs <- x$attributes$how$rcs_bird
+  output$sd_vvp_threshold <- x$attributes$how$sd_vvp_thresh
   # add location information
   if (geo) {
-    output$lat <- lat
-    output$lon <- lon
-    output$height_antenna <- x$attributes$where$height
+    output$radar_latitude <- lat
+    output$radar_longitude <- lon
+    output$radar_height <- x$attributes$where$height
+    output$radar_wavelength <- x$attributes$how$wavelength
   }
   # override the lat, lon attributes in case of user-provided values
   x$attributes$where$lat <- lat

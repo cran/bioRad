@@ -13,7 +13,7 @@
 #' @param method Method by which to do the time zone lookup. Either `fast`
 #'   (default) or `accurate`. See [lutz::tz_lookup_coords]].
 #' @param ... Optional lat, lon arguments.
-#'
+#' @returns integer representing the ordinal day of year or night of year.
 #' @name doy_noy
 #'
 #' @examples
@@ -46,7 +46,7 @@ noy <- function(x, ..., method = "fast") {
 #' @export
 doy.default <- function(x, lon, lat, ..., method = "fast") {
   tzone = lutz::tz_lookup_coords(lat, lon, method = method, warn = FALSE)
-  yday(lubridate::with_tz(x, tzone = tzone))
+  as.integer(lubridate::yday(lubridate::with_tz(x, tzone = tzone)))
 }
 
 #' @rdname doy_noy

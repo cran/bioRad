@@ -6,8 +6,8 @@
 \usage{
 read_pvolfile(
   file,
-  param = c("DBZH", "DBZ", "VRADH", "VRAD", "TH", "T", "RHOHV", "ZDR", "PHIDP", "CELL",
-    "BIOLOGY", "WEATHER", "BACKGROUND"),
+  param = c("DBZH", "DBZ", "VRADH", "VRAD", "WRADH", "WRAD", "TH", "T", "RHOHV", "ZDR",
+    "PHIDP", "CELL", "BIOLOGY", "WEATHER", "BACKGROUND"),
   sort = TRUE,
   lat,
   lon,
@@ -47,10 +47,10 @@ stored in file is overwritten.}
 \item{verbose}{A logical value, whether to print messages (\code{TRUE})
 to console.}
 
-\item{mount}{A character string with the mount point (a directory path)
+\item{mount}{(deprecated) A character string with the mount point (a directory path)
 for the Docker container.}
 
-\item{local_install}{(optional) String with path to local vol2bird installation,
+\item{local_install}{(deprecated) String with path to local vol2bird installation,
 to use local installation instead of Docker container}
 }
 \value{
@@ -65,17 +65,17 @@ Scan parameters are named according to the OPERA data information
 model (ODIM), see Table 16 in the
 \href{https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf}{ODIM specification}.
 Commonly available parameters are:
-\describe{
-\item{"\code{DBZH}", "\code{DBZ}"}{(Logged) reflectivity factor (dBZ)}
-\item{"\code{TH}", "\code{T}"}{(Logged) uncorrected reflectivity factor (dBZ)}
-\item{"\code{VRADH}", "\code{VRAD}"}{Radial velocity (m/s). Radial
+\itemize{
+\item \code{DBZH}, \code{DBZ}: (Logged) reflectivity factor (dBZ)
+\item \code{TH}, \code{T}: (Logged) uncorrected reflectivity factor (dBZ)
+\item \code{VRADH}, \code{VRAD}: Radial velocity (m/s). Radial
 velocities towards the radar are negative, while radial velocities away
-from the radar are positive}
-\item{"\code{RHOHV}"}{Correlation coefficient (unitless). Correlation
+from the radar are positive
+\item \code{RHOHV}: Correlation coefficient (unitless). Correlation
 between vertically polarized and horizontally polarized reflectivity
-factor}
-\item{"\code{PHIDP}"}{Differential phase (degrees)}
-\item{"\code{ZDR}"}{(Logged) differential reflectivity (dB)}
+factor
+\item \code{PHIDP}: Differential phase (degrees)
+\item \code{ZDR}: (Logged) differential reflectivity (dB)
 }
 }
 \examples{
