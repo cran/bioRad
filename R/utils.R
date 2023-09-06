@@ -8,7 +8,7 @@
 #'
 #' @return A matrix of the same dimension as `x`, with `TRUE`/`FALSE` values for
 #'   whether each cell in the original data frame is a number or not.
-#'
+#' @importFrom stats na.omit
 #' @keywords internal
 is.nan.data.frame <- function(x) do.call(cbind, lapply(x, is.nan))
 
@@ -28,6 +28,21 @@ skip_if_no_mistnet <- function() {
   testthat::skip("No MistNet")
 }
 
+#' Skip test if vol2birdR not installed
+#'
+#' Some functions require suggested package vol2birdR to be installed.
+#' This helper function allows to skip a test if vol2birdR is not available, e.g. when running in CI.
+#' Inspired by <https://testthat.r-lib.org/articles/skipping.html#helpers>.
+#' @return Invisibly returns TRUE if vol2birdR is installed, otherwise skips the test with
+#' a message "Package vol2birdR not installed".
+#' @keywords internal
+skip_if_no_vol2birdR <- function() {
+  if (rlang::is_installed("vol2birdR")) {
+    return(invisible(TRUE))
+  }
+  testthat::skip("Package vol2birdR not installed")
+}
+
 #' Check if radar codes are exactly 5 characters
 #'
 #' @param radars character vector. Radar codes to check, e.g. `c("bejab",
@@ -44,8 +59,10 @@ check_radar_codes <- function(radars) {
       paste(wrong_codes, collapse = ", ")
     )
   } else {
-    radars.csv <- utils::read.csv(url("https://lw-enram.s3-eu-west-1.amazonaws.com/radars.csv"))
-    wrong_codes <- radars[!(radars %in% radars.csv$countryradar)]
+    # Load the JSON data from the new URL
+    radars.json <- jsonlite::fromJSON("https://raw.githubusercontent.com/enram/aloftdata.eu/main/_data/OPERA_RADARS_DB.json")
+    radar_codes = na.omit(radars.json$odimcode)
+    wrong_codes <- radars[!(radars %in% radar_codes)]
     if (length(wrong_codes) > 0) {
       stop(
         "Radar codes don't exist: ",
@@ -54,6 +71,7 @@ check_radar_codes <- function(radars) {
     }
   }
 }
+
 
 #' Check if character date is in specific format
 #'
@@ -217,34 +235,17 @@ guess_file_type <- function(file_path, n_lines = 5) {
   }
 }
 
-#' Check if a number is a factor of another
+#' Check if remainder of a division is zero
 #'
 #' Determines if a given number is a factor of another number
 #' by checking if the remainder is zero after division.
-#' @param number The number to be checked if it is a factor.
-#' @param factor The potential factor to check against the number.
-#' @return A logical value indicating whether the factor is indeed a factor of the number.
+#' @param number The number to be divided (the dividend)
+#' @param divisor The divisor to check against the number.
+#' @return A logical value indicating whether the remainder of the division is zero
 #' @keywords internal
 #' @noRd
-isFactor <- function(number, factor) {
-  return(number %% factor == 0)
-}
-
-# Extract required fields from frictionless schema
-#' @param schema a frictionless schema
-#' @returns a character vector of required field names in a VPTS CSV schema
-#' @keywords internal
-#' @noRd
-get_required_fields <- function(schema) {
-  required_vars <- sapply(schema$fields, function(x) {
-    if (!is.null(x$constraints) && !is.null(x$constraints$required)) {
-      return(x$constraints$required)
-    } else {
-      return(FALSE)
-    }
-  })
-  required_fields <- sapply(schema$fields[required_vars], function(x) x$name)
-  return(required_fields)
+remainder_is_zero <- function(number, divisor) {
+  return(number %% divisor == 0)
 }
 
 # Recursive function to extract variable names from frictionless schema

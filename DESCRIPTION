@@ -1,6 +1,6 @@
 Package: bioRad
 Title: Biological Analysis and Visualization of Weather Radar Data
-Version: 0.7.1
+Version: 0.7.2
 Description: Extract, visualize and summarize aerial movements of birds and
     insects from weather radar data. See Dokter, A. M. et al. (2018) 
     "bioRad: biological analysis and visualization of weather radar data" <doi:10.1111/ecog.04028>
@@ -27,19 +27,19 @@ URL: https://github.com/adokter/bioRad/,
 BugReports: https://github.com/adokter/bioRad/issues
 biocViews:
 Depends: R (>= 3.5.0)
-Imports: assertthat, curl, fields, frictionless, ggplot2, glue,
-        graphics, lubridate, lutz, suntools, methods, raster, readr,
-        rhdf5, dplyr (>= 1.1.0), sp, stats, tidyr, utils, viridisLite,
-        viridis, rlang, jsonlite
-Suggests: vol2birdR, aws.s3, ggmap (>= 3.0.0), knitr, tidyselect,
-        rmarkdown, testthat (>= 3.0.0), vdiffr, sf
+Imports: assertthat, curl, dplyr (>= 1.1.0), fields, frictionless,
+        ggplot2, glue, graphics, jsonlite, lubridate, lutz, methods,
+        raster, readr, rhdf5, rlang, sp, stats, suntools, tidyr, utils,
+        viridis, viridisLite
+Suggests: aws.s3, ggmap (>= 3.0.0), knitr, rmarkdown, sf, testthat (>=
+        3.0.0), tidyselect, vdiffr, vol2birdR
 LazyData: true
 Encoding: UTF-8
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2023-07-17 16:11:05 UTC; amd427
+Packaged: 2023-09-06 13:43:11 UTC; amd427
 Author: Adriaan M. Dokter [aut, cre] (<https://orcid.org/0000-0001-6573-066X>),
   Peter Desmet [aut] (<https://orcid.org/0000-0002-8442-8025>),
   Bart Kranstauber [aut] (<https://orcid.org/0000-0001-8303-780X>),
@@ -56,4 +56,4 @@ Author: Adriaan M. Dokter [aut, cre] (<https://orcid.org/0000-0001-6573-066X>),
   Liesbeth Verlinden [ctb] (<https://orcid.org/0000-0003-1744-9325>)
 Maintainer: Adriaan M. Dokter <amd427@cornell.edu>
 Repository: CRAN
-Date/Publication: 2023-07-17 18:50:02 UTC
+Date/Publication: 2023-09-06 21:12:36 UTC

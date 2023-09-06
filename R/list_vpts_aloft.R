@@ -94,7 +94,7 @@ list_vpts_aloft <- function(date_min = NULL,
 
   ## set static urls --------------------------------------------------------
   # Set base URL
-  base_url <- "https://aloft.s3-eu-west-1.amazonaws.com"
+  base_url <- "https://aloftdata.s3-eu-west-1.amazonaws.com"
 
   # format csv --------------------------------------------------------------
   if (format == "csv") {
@@ -104,7 +104,7 @@ list_vpts_aloft <- function(date_min = NULL,
 
     found_vpts_aloft <-
       aws.s3::get_bucket_df(
-        bucket = "s3://aloft",
+        bucket = "s3://aloftdata",
         prefix = glue::glue("{source}/monthly"),
         region = "eu-west-1",
         max = Inf
@@ -124,7 +124,7 @@ list_vpts_aloft <- function(date_min = NULL,
   } else {
     # hdf5 files
     # TODO: create file paths of form
-    # https://aloft.s3-eu-west-1.amazonaws.com/baltrad/hdf5/bejab/2023/05/02/bejab_vp_20230502T000000Z_0x9.h5
+    # https://aloftdata.s3-eu-west-1.amazonaws.com/baltrad/hdf5/bejab/2023/05/02/bejab_vp_20230502T000000Z_0x9.h5
   }
 
   # format found data -------------------------------------------------------
@@ -142,7 +142,7 @@ list_vpts_aloft <- function(date_min = NULL,
   ## warn if no data found --------------------------------------------------
   if (rlang::is_empty(data_urls) && show_warnings) {
     warning(
-      glue::glue("No data found for radars between {date_min} - {date_max}")
+      glue::glue("No data found for radar(s) between {date_min} - {date_max}")
     )
     # stop here, no need to warn for radars and dates individually
     return(data_urls)
@@ -155,7 +155,7 @@ list_vpts_aloft <- function(date_min = NULL,
   if (!all_radars_found && show_warnings) {
     warning(
       glue::glue(
-        "Found no data for radars: {missing_radars_collapse}",
+        "Found no data for radar(s): {missing_radars_collapse}",
         missing_radars_collapse =
           glue::glue_collapse(
             glue::backtick(radars[!radars %in% found_radars]),
@@ -170,8 +170,8 @@ list_vpts_aloft <- function(date_min = NULL,
   if (!all(months %in% found_vpts_aloft$date) && show_warnings) {
     warning(
       glue::glue(
-        "Not every date has radar data, ",
-        "radars found for {first_date_found} to {last_date_found}",
+        "Radar data found between {first_date_found} and {last_date_found} ",
+        "but not every date has radar data",
         first_date_found = format(lubridate::ym(min(
           found_vpts_aloft$date
         )), "%Y-%m"),
