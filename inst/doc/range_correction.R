@@ -58,8 +58,8 @@ plot(my_corrected_ppi, param = "R")
 plot(my_corrected_ppi, param = "VIR")
 
 ## -----------------------------------------------------------------------------
-bm <- download_basemap(my_corrected_ppi)
-map(my_corrected_ppi, bm, param = "VIR", alpha = .5)
+bm <- "osm"
+map(my_corrected_ppi, map=bm, param = "VIR", alpha = .5)
 
 ## -----------------------------------------------------------------------------
 # calculate overlap between vertical profile of birds

@@ -432,12 +432,10 @@ the biological scatterers birds or insects? Why?</p>
 <div id="overlaying-radar-scans-on-maps" class="section level2">
 <h2>Overlaying radar scans on maps</h2>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># It is often informative to plot radar data on a base layer.</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># first download the background image:</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>basemap <span class="ot">&lt;-</span> <span class="fu">download_basemap</span>(my_ppi)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the basemap:</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(basemap)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># then overlay the PPI on the basemap, restricting the color scale from -20 to 40 dBZ:</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(my_ppi, <span class="at">map =</span> basemap, <span class="at">param =</span> <span class="st">&quot;DBZH&quot;</span>, <span class="at">zlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">20</span>, <span class="dv">40</span>))</span></code></pre></div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># First choose a base layer from the list of rosm::osm.types()</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>basemap <span class="ot">=</span> <span class="st">&quot;osm&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># then overlay the PPI on the basemap, restricting the color scale from -20 to 40 dBZ:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(my_ppi, <span class="at">map =</span> basemap, <span class="at">param =</span> <span class="st">&quot;DBZH&quot;</span>, <span class="at">zlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">20</span>, <span class="dv">40</span>))</span></code></pre></div>
 </div>
 </div>
 <div id="screening-out-weather" class="section level1">
