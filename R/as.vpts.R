@@ -1,4 +1,3 @@
-
 #' Convert a dataframe into a vpts object
 #'
 #' @param data a dataframe created from a VPTS CSV file
@@ -11,12 +10,8 @@
 #' @export
 as.vpts <- function(data) {
   assertthat::assert_that(inherits(data,"data.frame"))
-
-  # if dbz_all is a column name, rename to bioRad naming DBZH
-  if("dbz_all" %in% names(data)){
-    data <- data %>%
-      dplyr::rename(DBZH = "dbz_all")
-  }
+  
+  validate_vpts(data)
 
   height <- datetime <- source_file <- radar <- NULL
 
@@ -34,13 +29,6 @@ as.vpts <- function(data) {
     length(radar) == 1,
     msg = "`data` must contain data of a single radar."
   )
-
-  if (!exists("cached_schema")) {
-    # Load the schema from the data directory and cache it
-    cached_schema <- jsonlite::fromJSON(system.file("extdata", "vpts-csv-table-schema.json", package = "bioRad"),
-      simplifyDataFrame = FALSE, simplifyVector = TRUE
-    )
-  }
 
   data <- dplyr::mutate(
     data,
@@ -71,24 +59,49 @@ as.vpts <- function(data) {
     regular <- FALSE
   }
 
-  # Get attributes
-  radar_height <- data[["radar_height"]][1]
-  interval <- unique(heights[-1] - heights[-length(heights)])
-  wavelength <- data[["radar_wavelength"]][1]
-  if(length(unique(data[["radar_longitude"]]))>1) warning(paste0("multiple `radar_longitude` values found, storing only first (",lon,") as the functional attribute"))
-  lon <- data[["radar_longitude"]][1]
-  if(length(unique(data[["radar_latitude"]]))>1) warning(paste0("multiple `radar_latitude` values found, storing only first (",lat,") as the functional attribute"))
-  lat <- data[["radar_latitude"]][1]
-  if(length(unique(data[["rcs"]]))>1) warning(paste0("multiple `rcs` values found, storing only first (",rcs,") as the functional attribute"))
-  rcs <- data[["rcs"]][1]
-  if(length(unique(data[["sd_vvp_threshold"]]))>1) warning(paste0("multiple `sd_vvp_threshold` values found, storing only first (",sd_vvp_threshold,") as the functional attribute"))
-  sd_vvp_threshold <- data[["sd_vvp_threshold"]][1]
+# Get attributes
+radar_height <- data[["radar_height"]][1]
+interval <- unique(heights[-1] - heights[-length(heights)])
+wavelength <- data[["radar_wavelength"]][1]
 
-  # Convert dataframe
-  maskvars <- c("radar", "rcs", "sd_vvp_threshold", "radar_latitude", "radar_longitude", "radar_height", "radar_wavelength", "source_file", "datetime", "height", "sunrise", "sunset", "day")
+# Check and warn for multiple values of specific attributes and return only the first values of those attributes
+check_multivalue_attributes <- function(data) {
+  attributes <- c("radar_longitude", "radar_latitude", "rcs", "sd_vvp_threshold")
+  first_values <- list()
+  for (attr in attributes) {
+    if (length(unique(data[[attr]])) > 1) {
+      warning(paste0("multiple ", as.character(substitute(attr))," values found, storing only first (",
+                     as.character(data[[attr]][1]), ") as the functional attribute."))
+    }
+    first_values[[attr]] <- data[[attr]][1]
+  }
+    return(first_values)
+}
 
+  first_values <- check_multivalue_attributes(data)
+  
+  # Directly extract and assign values from the list
+  lon <- first_values$radar_longitude
+  lat <- first_values$radar_latitude
+  rcs <- first_values$rcs
+  sd_vvp_threshold <- first_values$sd_vvp_threshold
+  
+  # Define set of radar variables that must be present at each height (including alternatives)
+  radvars <- c("u", "v", "w", "ff", "dd", "sd_vvp", "gap", "eta", "dens", "dbz", "dbz_all", "n", "n_dbz", "n_all", "n_dbz_all")
+  radvars <- c(radvars, unlist(vpts_schema$fields$nameAlternatives[vpts_schema$fields$name %in% radvars]))
 
-  data <- df_to_mat_list(data, maskvars, cached_schema)
+  data <- df_to_mat_list(data, radvars)
+
+    # List of vectors to check
+  vectors_to_check <- list(heights = heights, interval = interval, radar_height = radar_height, lon = lon, lat = lat)
+
+  # Identify empty vectors
+  empty_vectors <- names(vectors_to_check)[sapply(vectors_to_check, function(v) length(v) == 0)]
+
+  # Stop execution if any empty vectors are found
+  if (length(empty_vectors) > 0) {
+      stop("Empty vectors detected: ", paste(empty_vectors, collapse=", "))
+  }
 
   # Create vpts object
   output <- list(

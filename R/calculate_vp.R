@@ -171,19 +171,16 @@
 #'
 #' @examples
 #' # Locate and read the polar volume example file
-#' pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
-#'
-#' # Copy the file to a home directory with read/write permissions
-#' file.copy(pvolfile, "~/volume.h5")
+#' pvolfile_source <- system.file("extdata", "volume.h5", package = "bioRad")
 #'
 #' # Calculate the profile
-#' vp <- calculate_vp("~/volume.h5")
-#'
+#' if (requireNamespace("vol2birdR", quietly = TRUE)) {
+#' vp <- calculate_vp(pvolfile_source)
+#' 
 #' # Get summary info
 #' vp
+#' }
 #'
-#' # Clean up
-#' file.remove("~/volume.h5")
 calculate_vp <- function(file, vpfile = "", pvolfile_out = "",
                          autoconf = FALSE, verbose = FALSE, warnings = TRUE,
                          mount, sd_vvp_threshold,
@@ -357,6 +354,7 @@ calculate_vp <- function(file, vpfile = "", pvolfile_out = "",
     config$minNyquist <- nyquist_min
     config$dbzType <- dbz_quantity
     config$dualPol <- dual_pol
+    config$singlePol <- single_pol
     config$dealiasVrad <- dealias
     if (!missing(sd_vvp_threshold)) config$stdDevMinBird <- sd_vvp_threshold
   } else {

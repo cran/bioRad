@@ -1,6 +1,31 @@
-# bioRad 0.7.3
+
+# bioRad 0.8.0
 
 ## New features
+
+*  ENRAM VPTS data exchange format added in package data as `vpts_schema.rda`
+
+*  VPTS files are now able to be validated with `validate_vpts()` which uses the schema to check for min/max constraint violations for specific fields, regex and datetime formatting
+
+* speed up `integrate_to_ppi()` and `project_as_ppi()` by using native `sf` functions (#669)
+
+* support for tidyverse select method for polar volume and polar scan objects (#668,#460)
+
+## Bugfixes
+
+* Corrected the default refractive index value used in conversion of linear reflectivity (eta) to logarithmic reflectivity (dBZ). The effect is a 7% increase in animal densities in output of functions `integrate_to_ppi()` and `read_cajun()` only (#642).
+
+* Fixed the handling of empty numeric vectors when plotting clutter maps (#655)
+
+* Fixed warning when reading VPTS csv containing multiple values in `lat`, `lon`, '`rcs`' or `sd_vvp_threshold` (#651)
+
+* Fixed enabling/disabling of `single_pol` flag in `calculate_vp()` (#646)
+
+* Updated the s3 source bucket of `download_vpfiles()` to https://aloftdata.s3-eu-west-1.amazonaws.com (#648)
+
+* Fixed an error in the idw method of `composite_ppi()` that emerged with the evolution of dependency package sp / deprecation of rgdal (#666)
+
+# bioRad 0.7.3
 
 * Replaced the `ggmap` package with `ggspatial` for map visualizations. This change was made as `ggmap` no longer provides reliable open-source basemaps without the necessity to register for an API key (#638).
 
@@ -8,7 +33,7 @@
 
 * Corrected incorrect mapping of to `dbz_all` data column in [VPTS CSV](https://aloftdata.eu/vpts-csv/) format to corresponding `DBZH` data column in bioRad vpts object (#634).
 
-* Improved the VPTS file fetching mechanism from s3: now skips a day if there are issues with fetching instead of aborting the entire download (#636)
+* Improved the polar volume downloads by `download_pvolfiles()`: now skips a day if there are issues with fetching instead of aborting the entire download (#636)
 
 ## Deprecations
 
@@ -63,7 +88,6 @@ bioRad 0.7 includes a major backend overhaul that deprecates the use of Docker. 
 * Fix bug in height integration, which excluded the lowest bins for certain low altitude radars (#534).
 
 ## Deprecations
-
 
 
 * Argument `local_install` in `calculate_vp()` and `apply_mistnet()` is now deprecated.
