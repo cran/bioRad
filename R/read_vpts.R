@@ -91,13 +91,14 @@ read_vpts <- function(files, data_frame = FALSE, ...) {
 #' @noRd
 read_vpts_csv <- function(files, data_frame = FALSE) {
 
-  suppressMessages(
-  data <- readr::read_csv(files, show_col_types = FALSE,
-  col_types = readr::cols(
-     .default = readr::col_guess(),  
-     `...1` = readr::col_skip()      # Skip unnamed columns
-    ))
-  )
+  #suppressMessages(
+  data <- readr::read_csv(files, show_col_types = FALSE)
+  #,
+  #col_types = readr::cols(
+  #   .default = readr::col_guess(),  
+  #   `...1` = readr::col_skip()      # Skip unnamed columns
+  #  ))
+  #)
 
   #Validate the data
   validate_vpts(data)
@@ -107,7 +108,6 @@ read_vpts_csv <- function(files, data_frame = FALSE) {
 
   data <- dplyr::mutate(
     data,
-    radar = as.factor(radar),
     datetime = as.POSIXct(datetime, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
   )
 

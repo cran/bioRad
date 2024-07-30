@@ -1,11 +1,19 @@
 
+# bioRad 0.8.1
+
+## bugfixes
+
+* dbz_all field in VPTS CSV files is now correctly mapped to DBZH field
+
+* non-standard data fields are now retained in vpts objects produced with as.vpts()
+
 # bioRad 0.8.0
 
 ## New features
 
-*  ENRAM VPTS data exchange format added in package data as `vpts_schema.rda`
+* ENRAM VPTS data exchange format added in package data as `vpts_schema.rda`
 
-*  VPTS files are now able to be validated with `validate_vpts()` which uses the schema to check for min/max constraint violations for specific fields, regex and datetime formatting
+* VPTS files are now able to be validated with `validate_vpts()` which uses the schema to check for min/max constraint violations for specific fields, regex and datetime formatting
 
 * speed up `integrate_to_ppi()` and `project_as_ppi()` by using native `sf` functions (#669)
 
