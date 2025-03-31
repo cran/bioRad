@@ -12,6 +12,9 @@ status](https://www.r-pkg.org/badges/version/bioRad)](https://cran.r-project.org
 status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![codecov](https://codecov.io/gh/adokter/bioRad/branch/master/graph/badge.svg?token=pDmyO4JVJu)](https://app.codecov.io/gh/adokter/bioRad)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3370004.svg)](https://doi.org/10.5281/zenodo.3370004)
+[![vol2birdR
+DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7992026.svg)](https://doi.org/10.5281/zenodo.7992026)
+
 <!-- badges: end -->
 
 bioRad provides standardized methods for extracting and reporting
@@ -54,14 +57,16 @@ libraries need to be installed as system libraries prior to
 installation, which are required by dependency package
 **[vol2birdR](https://adriaandokter.com/vol2birdR/)**:
 
-| System                                      | Command                                                           |
-|:--------------------------------------------|:------------------------------------------------------------------|
-| **OS X (using Homebrew)**                   | `brew install hdf5 proj gsl`                                      |
+| System | Command |
+|:---|:---|
+| **OS X (using Homebrew)** | `brew install hdf5 proj gsl` |
 | **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev` |
-| **Systems supporting yum and RPMs**         | `sudo yum install hdf5-devel proj-devel gsl gsl-devel`            |
+| **Systems supporting yum and RPMs** | `sudo yum install hdf5-devel proj-devel gsl gsl-devel` |
 
 <details>
+
 <summary>
+
 Additional required system libraries on Linux (Ubuntu)
 </summary>
 
@@ -97,10 +102,8 @@ Then load the package with:
 
 ``` r
 library(bioRad)
-#> Welcome to bioRad version 0.8.1
-#> Attempting to load MistNet from:/Users/amd427/Library/R/x86_64/4.3/library/vol2birdR/lib
-#> MistNet successfully initialized.
-#> using vol2birdR version 1.0.3 (MistNet installed)
+#> Welcome to bioRad version 0.9.0
+#> using vol2birdR version 1.0.9 (MistNet installed)
 ```
 
 ### (optional) Enable MistNet

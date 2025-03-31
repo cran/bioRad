@@ -89,7 +89,7 @@ plot.vpi <- function(x, quantity = "mtr", xlab = "time",
     if (quantity == "mtr") ylab <- "migration traffic rate [#/km/h]"
     if (quantity == "rtr") ylab <- expression("reflectivity traffic rate [cm"^2 * "/km/h]")
     if (quantity == "vid") ylab <- expression("vertically integrated density [#/km"^2 * "]")
-    if (quantity == "vir") ylab <- expression("vertically integrated reflectivity [cm"^2 * "/km/h]")
+    if (quantity == "vir") ylab <- expression("vertically integrated reflectivity [cm"^2 * "/km"^2 * "]")
     if (quantity == "mt") ylab <- expression("(cumulative) migration traffic [#/km]")
     if (quantity == "rt") ylab <- expression("(cumulative) reflectivity traffic [cm"^2 * "/km]")
     if (quantity == "ff") ylab <- expression("vertically averaged ground speed [m/s]")
@@ -116,7 +116,7 @@ plot.vpi <- function(x, quantity = "mtr", xlab = "time",
 
   # plot the data
   plot(x$datetime, x[quantity][[1]],
-    type = "l", xlab = "time", ylab = ylab,
+    type = "l", xlab = xlab, ylab = ylab,
     ylim = ylim, main = main, xaxs = "i", yaxs = "i", ...
   )
 
@@ -145,8 +145,8 @@ plot.vpi <- function(x, quantity = "mtr", xlab = "time",
     # determine the plot range of the night time shading
     if (missing(ylim)) {
       pol.range <- c(
-        min(c(0, 2 * min(x[quantity][[1]]))),
-        2 * max(x[quantity][[1]])
+        min(c(0, 2 * min(x[quantity][[1]], na.rm = TRUE))),
+        2 * max(x[quantity][[1]], na.rm = TRUE)
       )
     } else {
       pol.range <- ylim
@@ -167,7 +167,7 @@ plot.vpi <- function(x, quantity = "mtr", xlab = "time",
     # plot the data again on top of the shading
     graphics::points(x$datetime, x[quantity][[1]],
       type = "l",
-      xlab = "time", ylab = ylab, ylim = ylim, main = main, ...
+      xlab = xlab, ylab = ylab, ylim = ylim, main = main, ...
     )
   }
 }

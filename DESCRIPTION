@@ -1,6 +1,6 @@
 Package: bioRad
 Title: Biological Analysis and Visualization of Weather Radar Data
-Version: 0.8.1
+Version: 0.9.0
 Description: Extract, visualize and summarize aerial movements of birds and
     insects from weather radar data. See Dokter, A. M. et al. (2018) 
     "bioRad: biological analysis and visualization of weather radar data" <doi:10.1111/ecog.04028>
@@ -32,14 +32,14 @@ Imports: assertthat, curl, dplyr (>= 1.1.0), fields, ggplot2, glue,
         rhdf5, rlang, sf, sp, stats, stringr, suntools, tidyr,
         tidyselect, utils, viridis, viridisLite
 Suggests: aws.s3, ggspatial, knitr, prettymapr, rmarkdown, rosm,
-        testthat (>= 3.0.0), vdiffr, vol2birdR
+        testthat (>= 3.0.0), vdiffr, vol2birdR (>= 1.0.9)
 LazyData: true
 Encoding: UTF-8
 VignetteBuilder: knitr
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2024-07-29 19:38:24 UTC; amd427
+Packaged: 2025-03-31 18:24:03 UTC; amd427
 Author: Adriaan M. Dokter [aut, cre] (<https://orcid.org/0000-0001-6573-066X>),
   Peter Desmet [aut] (<https://orcid.org/0000-0002-8442-8025>),
   Bart Kranstauber [aut] (<https://orcid.org/0000-0001-8303-780X>),
@@ -56,4 +56,4 @@ Author: Adriaan M. Dokter [aut, cre] (<https://orcid.org/0000-0001-6573-066X>),
   Liesbeth Verlinden [ctb] (<https://orcid.org/0000-0003-1744-9325>)
 Maintainer: Adriaan M. Dokter <biorad@cornell.edu>
 Repository: CRAN
-Date/Publication: 2024-07-30 17:10:02 UTC
+Date/Publication: 2025-03-31 19:10:06 UTC

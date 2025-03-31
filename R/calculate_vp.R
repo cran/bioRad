@@ -10,7 +10,7 @@
 #'   files containing a single scan/sweep. Or a single `pvol` object. The file data format should be either 1)
 #'   [ODIM](https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf)
 #'    format, which is the implementation of the OPERA data information model in
-#'   the [HDF5](https://support.hdfgroup.org/HDF5/) format, 2) a format
+#'   the [HDF5](https://www.hdfgroup.org/solutions/hdf5/) format, 2) a format
 #'   supported by the [RSL
 #'   library](https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/) or 3) Vaisala
 #'   IRIS (IRIS RAW) format.
@@ -364,14 +364,16 @@ calculate_vp <- function(file, vpfile = "", pvolfile_out = "",
     config$dualPol <- dual_pol
     config$singlePol <- single_pol
     config$dealiasVrad <- dealias
-    if (!missing(sd_vvp_threshold)) config$stdDevMinBird <- sd_vvp_threshold
-  } else {
-    # setting stdDevMinBird triggers it to be set according to wavelength (1 m/s for S-band, 2 m/s for C-band)
-    config$stdDevMinBird <- -1
+    if (!missing(sd_vvp_threshold)){
+       config$stdDevMinBird <- sd_vvp_threshold
+    } else {
+       # setting stdDevMinBird triggers it to be set according to wavelength (1 m/s for S-band, 2 m/s for C-band)
+       config$stdDevMinBird <- -1
+    }
+    config$mistNetElevs <- mistnet_elevations
+    config$useMistNet <- mistnet
+    if (!missing(local_mistnet) & mistnet) config$mistNetPath <- local_mistnet
   }
-  config$mistNetElevs <- mistnet_elevations
-  config$useMistNet <- mistnet
-  if (!missing(local_mistnet) & mistnet) config$mistNetPath <- local_mistnet
 
   # run vol2bird
   ## use helper to allow vol2bird to silence output (vol2bird doesn't actually

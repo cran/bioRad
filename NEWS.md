@@ -1,11 +1,47 @@
+# bioRad 0.9.0
+## new features
+
+* new function `as.vp()` to convert data.frame to vertical profile object (#699)
+
+* new function `clean_mixture()` for partitioning bird and insect mixtures (#700)
+
+* new function `filter_precip()` for posthoc removal of precipitation in vp and vpts objects (#701)
+
+* New argument `zoomin` for function `bioRad::map()` to increase basemap resolution (#689).
+
+* Added Citation File Format (cff) metadata to package (#680)
+
+## bugfixes
+
+* Corrected units specified in plot label for quantity VIR (#674).
+
+* Discard profiles with misspecified altitude bins in `as.vpts()` and `read_vpts()` (#684).
+
+* Correct type of gap field in vpts objects for profiles stored in ODIM HDF5 format (.h5) (#635, #691).
+
+* Interpret NA values in field DBZH in `integrate_to_ppi()` as pixels that were not irradiated (#658).
+
+* Fixes a bug that prevented a data.frame to be converted to a vpts object with as.vpts() when profiles are not sorted in datetime and height (#692).
+
+* Bugfix for ignored `xlab` argument in `plot.vpi()` and night shading fix for dealing with NA values (#693)
+
+* Bugfix for incorrect default sd_vvp_threshold value for S-band data (2 m/s instead of correct 1 m/s) (#695)
+
+* Added workaround for using `ifelse()` statements in `calculate_param()` (#672, #673).
+
+* Bugfix for not working `zlim` argument in `integrate_to_ppi()` (#702)
+
+* Fixes cropping in `map()` with `xlim` and `ylim` arguments (#707)
 
 # bioRad 0.8.1
 
 ## bugfixes
 
-* dbz_all field in VPTS CSV files is now correctly mapped to DBZH field
+* dbz_all field in VPTS CSV files is now correctly mapped to DBZH field (#661).
 
-* non-standard data fields are now retained in vpts objects produced with as.vpts()
+* Non-standard data fields are now retained in vpts objects produced with as.vpts() (#661).
+
+* Corrected the type of gap field in vpts objects to logical (#635).
 
 # bioRad 0.8.0
 
