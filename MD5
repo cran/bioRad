@@ -1,7 +1,7 @@
-68a3a55f1797167a5d5505b502e001b1 *DESCRIPTION
+f0454c3018ffde1628fc75711864d8de *DESCRIPTION
 374de0f67e45d9b04e151ab22e608a98 *LICENSE
 6f29358acd87f34ff40a913a9e2cc278 *NAMESPACE
-e86a5b82da91273c4ec91a9ccda7ad83 *NEWS.md
+df4013b899d4d3ae59b71357c6c13702 *NEWS.md
 6d1457b373ecae8a15a88686a85b9ed8 *R/apply_mistnet.R
 e0aade292420ee5939b32c110baf76d1 *R/as.data.frame.R
 f84ce6b810184f2a91a4ba0aa468f8c4 *R/as.vp.R
@@ -34,7 +34,7 @@ ec63289d87d6c40aeb9df2633ef60a87 *R/hooks.R
 3d6b9b9e8a530c254715c51d24ae498d *R/integrate_to_ppi.R
 bc391f2e0d10bbac6a183dcbeea0deb4 *R/iris.R
 b9f7cdf953ff5cd96ea31e927aeafb5f *R/list_vpts_aloft.R
-fbb582ee5f14ba70ab2123c00f4eaa17 *R/map.R
+cad288d19ee1029a9d8e78f5bed41e7d *R/map.R
 3602b236452685131878cfcbd5dacd8c *R/nexrad_odim.R
 fd8426f472cf90bf48a166cc19c429df *R/nyquist_velocity.R
 79a1932aa75c652988b1b4ad5bb13674 *R/operators.R
@@ -69,7 +69,7 @@ b5e37fd17ecd33279d58770fd92377a0 *R/vpfile.R
 886ddd43d9d7b19dddd7e59d1830d28f *R/vpi.R
 26bbf19a5ad128b30a1c3b0384dd93a9 *R/vpts.R
 b8c341c17cde3f4c6a7ad7ee85301988 *R/write_pvolfile.R
-d9dc924bb6c641943092e5db449c36d2 *README.md
+21a8f24c5a6b2e90d4f4a4ace80ab9e4 *README.md
 76161b65639451c966be75488458b3c3 *build/partial.rdb
 6ee223a64238c2e94aa04f5604c973bb *build/vignette.rds
 d46dae4bac00e1a58e7aea08d55117c6 *data/example_scan.rda
@@ -78,13 +78,13 @@ bc611624121a1b871d255197bdd78ac5 *data/example_vpts.rda
 728009f483ce92bc9f6a32b980b80ce5 *data/vpts_schema.rda
 7166fe4c52be10270e19ae857f280abc *inst/CITATION
 8c901894b7c316b3d24adcc7da16ffd9 *inst/doc/bioRad.Rmd
-ea2105462f0297d37ad00755f5ef6f60 *inst/doc/bioRad.html
+21fea472ffc782f71a8d9af3b9a7fe3e *inst/doc/bioRad.html
 2730d20eaa0a1694967de2c79727afbe *inst/doc/rad_aero_22.R
 b785fac974687f234b4c10fd64e307c2 *inst/doc/rad_aero_22.Rmd
 441397bb67c7b83f28d5f5ba7dce0df2 *inst/doc/rad_aero_22.html
 08c34f56f2e9818263fd6c2df2744150 *inst/doc/range_correction.R
 531d9782320e6218817af4849a744454 *inst/doc/range_correction.Rmd
-a4769a05ce052a8809543ee25cdc94e8 *inst/doc/range_correction.html
+d30ff881a3a7de0da6e314c3209b66aa *inst/doc/range_correction.html
 1a86438eb603971d0b62ac0c78083c29 *inst/extdata/example_vpts.csv
 c0130f4bfdb7035ecc99493507da8efa *inst/extdata/example_vpts.txt
 1a9280c8a57bb2e7f8afa067d5368be5 *inst/extdata/profile.h5
@@ -124,7 +124,7 @@ ae3e1d1a29f52aa3af61512b9184ff00 *man/example_scan.Rd
 0f1ba5594d687caab7bf3bf1c9b663da *man/example_vp.Rd
 00eae44d48e7d29369c6d686bdeebe86 *man/example_vpts.Rd
 ee44f7d072cf4b823d4f0af0d57a1784 *man/extract_string.Rd
-9276aa2ed366babb155a9bde3a569d7e *man/figures/README-plot_ppi-1.png
+3cc36b5a068fe52ab456b562c96d9060 *man/figures/README-plot_ppi-1.png
 c1255e75e0701fa99139b1453ab6d6d4 *man/figures/README-plot_vpi-1.png
 0508026b4d6fad315b6288d99c971acd *man/figures/README-plot_vpts-1.png
 76824fe4d7fff93b01d6c71d68591332 *man/figures/logo.png
@@ -143,7 +143,7 @@ b4a9a91ec47aae6ab1fde67ea3987b37 *man/get_scan.Rd
 d69e1b7dcadad3a6d4d890b90153027c *man/is.pvolfile.Rd
 188b6f06c51ba25d583e5a30591681a2 *man/is.vpfile.Rd
 760186340195d9496c46dae779f98736 *man/list_vpts_aloft.Rd
-3ca0aab057193c3aa21a2da63def79c9 *man/map.Rd
+347d7838c42a008361d06ba53086234d *man/map.Rd
 5d8d8e46087c0f9347ef8a42b25cc79b *man/match_filenames.Rd
 064bb837e8c4593268543a538c5f7c91 *man/nexrad_to_odim.Rd
 c94ba2fe9c23c49c4b6954197df9c6aa *man/nyquist_velocity.Rd
