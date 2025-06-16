@@ -14,12 +14,15 @@
 #' @param overwrite logical. TRUE for re-downloading and overwriting previously
 #'   downloaded files of the same names.
 #' @param bucket character. Bucket name to use.
+#' @param directory_tree logical. Whether to create the yyyy/mm/dd/radar
+#' directory structure. TRUE by default.
 #'
 #' @export
-#' @return `NULL`. The function's primary effect is to download selected polar volume 
-#' files from the NEXRAD Level II archive to a specified local directory, and to provide 
-#' a message and a progress bar in the console indicating the download status. 
+#' @return `NULL`. The function's primary effect is to download selected polar volume
+#' files from the NEXRAD Level II archive to a specified local directory, and to provide
+#' a message and a progress bar in the console indicating the download status.
 #' @examples
+#' \donttest{
 #' # create temporary directory
 #' if (requireNamespace("aws.s3", quietly = TRUE)) {
 #' temp_dir <- paste0(tempdir(),"/bioRad_tmp_files")
@@ -34,9 +37,10 @@
 #' # Clean up
 #' unlink(temp_dir, recursive = TRUE)
 #' }
+#' }
 download_pvolfiles <- function(date_min, date_max, radar,
                                directory = ".", overwrite = FALSE,
-                               bucket = "noaa-nexrad-level2") {
+                               bucket = "noaa-nexrad-level2", directory_tree = TRUE) {
   rlang::check_installed('aws.s3','to download pvolfiles.')
   # Ensure directory exists
   assertthat::assert_that(assertthat::is.dir(directory))
@@ -58,6 +62,9 @@ download_pvolfiles <- function(date_min, date_max, radar,
 
   # Stop if overwrite is not a logical
   assertthat::assert_that(is.logical(overwrite), msg = "overwrite is not a logical")
+
+  # assert that directory_tree is logical
+  assertthat::assert_that(is.logical(directory_tree))
 
   # Change timezone
   if (attr(date_min, "tzone") == "") {
@@ -92,6 +99,7 @@ download_pvolfiles <- function(date_min, date_max, radar,
         assertthat::assert_that(aws.s3::bucket_exists(bucket = bucket),
           msg = paste0("The bucket ", bucket, "does not exist")
         )
+        stop(paste0("Could not connect to s3 bucket ", bucket, "."))
       }
     )
 
@@ -157,11 +165,18 @@ download_pvolfiles <- function(date_min, date_max, radar,
     pb <- utils::txtProgressBar(min = 0, max = nrow(bucket_df), initial = 0, style = 3)
 
     for (row in 1:nrow(bucket_df)) {
+      # create local filename
+      if(directory_tree){
+        local_file = paste(directory, bucket_df$Key[row], sep = "/")
+      }
+      else{
+        local_file = paste(directory, basename(bucket_df$Key[row]), sep = "/")
+      }
       # Save file
       aws.s3::save_object(
         object = bucket_df$Key[row],
         bucket = bucket,
-        file = paste(directory, bucket_df$Key[row], sep = "/"),
+        file = local_file,
         overwite = overwrite
       )
       utils::setTxtProgressBar(pb, row)

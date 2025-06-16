@@ -10,7 +10,8 @@ download_pvolfiles(
   radar,
   directory = ".",
   overwrite = FALSE,
-  bucket = "noaa-nexrad-level2"
+  bucket = "noaa-nexrad-level2",
+  directory_tree = TRUE
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ downloaded}
 downloaded files of the same names.}
 
 \item{bucket}{character. Bucket name to use.}
+
+\item{directory_tree}{logical. Whether to create the yyyy/mm/dd/radar
+directory structure. TRUE by default.}
 }
 \value{
 \code{NULL}. The function's primary effect is to download selected polar volume
@@ -40,6 +44,7 @@ Download a selection of polar volume (\code{pvol}) files from the
 \href{https://registry.opendata.aws/noaa-nexrad/}{NEXRAD Level II archive data}.
 }
 \examples{
+\donttest{
 # create temporary directory
 if (requireNamespace("aws.s3", quietly = TRUE)) {
 temp_dir <- paste0(tempdir(),"/bioRad_tmp_files")
@@ -53,5 +58,6 @@ download_pvolfiles(
 )
 # Clean up
 unlink(temp_dir, recursive = TRUE)
+}
 }
 }
