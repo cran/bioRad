@@ -7,7 +7,6 @@ overwrite <- TRUE
 
 test_that("date input for download_pvolfiles() ", {
   skip_if_offline()
-  skip_if_no_aws.s3()
   # working with default
   expect_no_error(
     suppressMessages(
@@ -109,7 +108,6 @@ test_that("date input for download_pvolfiles() ", {
 
 test_that("Check radar code for download_pvolfiles() ", {
   skip_if_offline()
-  skip_if_no_aws.s3()
   expect_error(
     download_pvolfiles(date_min,
                        date_max,
@@ -126,7 +124,7 @@ test_that("Check radar code for download_pvolfiles() ", {
     regexp = paste0(
       "No data available for ABCD on the 2016-10-02. Check radar",
       " code and data availability on",
-      " https://noaa-nexrad-level2.s3.amazonaws.com/index.html"
+      " https://unidata-nexrad-level2.s3.amazonaws.com/index.html"
     ),
     fixed = TRUE
   )
@@ -134,7 +132,6 @@ test_that("Check radar code for download_pvolfiles() ", {
 
 test_that("Check path and overwrite for download_pvolfiles() ", {
   skip_if_offline()
-  skip_if_no_aws.s3()
   expect_error(
     download_pvolfiles(date_min, date_max, radars, 1, overwrite),
     "path is not a string (a length one character vector)",

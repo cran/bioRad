@@ -55,29 +55,15 @@ Documentation for the latest development version can be found
 For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5
 libraries need to be installed as system libraries prior to
 installation, which are required by dependency package
-**[vol2birdR](https://adriaandokter.com/vol2birdR/)**:
+**[vol2birdR](https://adriaandokter.com/vol2birdR/)**. On linux,
+additionally, CURL, SSL and GDAL are required by other dependency
+packages of bioRad:
 
 | System | Command |
 |:---|:---|
 | **OS X (using Homebrew)** | `brew install hdf5 proj gsl` |
-| **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev` |
-| **Systems supporting yum and RPMs** | `sudo yum install hdf5-devel proj-devel gsl gsl-devel` |
-
-<details>
-
-<summary>
-
-Additional required system libraries on Linux (Ubuntu)
-</summary>
-
-The following system libraries are required before installing bioRad on
-Linux systems. In terminal, install these with:
-
-    sudo apt install libcurl4-openssl-dev
-    sudo apt install libssl-dev
-    sudo apt install libgdal-dev
-
-</details>
+| **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev libcurl4-openssl-dev libssl-dev libgdal-dev` |
+| **Systems supporting yum and RPMs** | `sudo yum install hdf5-devel proj-devel gsl gsl-devel libcurl-devel openssl-devel gdal gdal-devel` |
 
 <br>
 
@@ -102,8 +88,8 @@ Then load the package with:
 
 ``` r
 library(bioRad)
-#> Welcome to bioRad version 0.10.0
-#> using vol2birdR version 1.1.0 (MistNet installed)
+#> Welcome to bioRad version 0.10.0.9000
+#> using vol2birdR version 1.1.1.9000 (MistNet installed)
 ```
 
 ### (optional) Enable MistNet
@@ -128,7 +114,7 @@ bioRad can read weather radar data (= polar volumes) in the
 format and formats supported by the [RSL
 library](https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/), such as
 NEXRAD data. NEXRAD data (US) are [available as open
-data](https://www.ncdc.noaa.gov/nexradinv/) and on
+data](https://www.ncei.noaa.gov/nexradinv/) and on
 [AWS](https://registry.opendata.aws/noaa-nexrad/).
 
 Here we read an example polar volume data file with `read_pvolfile()`,
